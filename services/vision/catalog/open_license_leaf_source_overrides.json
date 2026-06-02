@@ -1,0 +1,1517 @@
+{
+  "notes": [
+    "Use excludedSourceImages to blacklist bad source photos before patch generation.",
+    "Use manualCropBoxes to force a source-image crop when the auto-crop misses the usable leaf area.",
+    "cropBox uses source-image pixel coordinates in the form [left, top, right, bottom]."
+  ],
+  "speciesNotes": [
+    {
+      "slug": "prunus-mume",
+      "note": "There are not a single picture of leaves for this species - only flowers",
+      "updatedAt": "2026-05-21T07:05:56.852Z"
+    },
+    {
+      "slug": "ulmus-parvifolia",
+      "note": "given how common this species is for bonsai it should be easy to find better pictures. even the approved onces are low quality and taken from far away",
+      "updatedAt": "2026-06-01T19:41:21.470Z"
+    }
+  ],
+  "excludedSourceImages": [
+    {
+      "sourceName": "gbif",
+      "slug": "malus-halliana",
+      "externalId": "https://media01.symbiota.org/media/seinet/sernec/USCH/USCH0055/USCH0055145.JPG",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "gbif",
+      "slug": "malus-halliana",
+      "externalId": "https://media01.symbiota.org/media/seinet/sernec/USCH/USCH0055/USCH0055146.JPG",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "gbif",
+      "slug": "malus-halliana",
+      "externalId": "https://media01.symbiota.org/media/seinet/sernec/USCH/USCH0055/USCH0055221.JPG",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "acer-palmatum",
+      "externalId": "248194967",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "acer-palmatum",
+      "externalId": "385454008",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "bougainvillea",
+      "externalId": "113376096",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "bougainvillea",
+      "externalId": "113376144",
+      "reason": "User review: wrong plant, not bougainvillea."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "camellia-japonica",
+      "externalId": "307161003",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "camellia-japonica",
+      "externalId": "3190034",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "camellia-japonica",
+      "externalId": "341068173",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "camellia-japonica",
+      "externalId": "341068194",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "chaenomeles-japonica",
+      "externalId": "399400445",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "chaenomeles-japonica",
+      "externalId": "515433716",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "chamaecyparis-obtusa",
+      "externalId": "31655684",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "chamaecyparis-obtusa",
+      "externalId": "31655689",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "chamaecyparis-obtusa",
+      "externalId": "31655695",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "chamaecyparis-obtusa",
+      "externalId": "31655699",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "chamaecyparis-obtusa",
+      "externalId": "31655703",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "chamaecyparis-obtusa",
+      "externalId": "31655705",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "cotoneaster",
+      "externalId": "560296830",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "crassula-ovata",
+      "externalId": "15938893",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "crassula-ovata",
+      "externalId": "15938900",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "crassula-ovata",
+      "externalId": "601334133",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "fagus-crenata",
+      "externalId": "446873019",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "fagus-crenata",
+      "externalId": "593993659",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "fagus-crenata",
+      "externalId": "593993665",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "fagus-sylvatica",
+      "externalId": "349506389",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "fagus-sylvatica",
+      "externalId": "349506422",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "fagus-sylvatica",
+      "externalId": "408459425",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "fagus-sylvatica",
+      "externalId": "408459440",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "fagus-sylvatica",
+      "externalId": "408459447",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "fagus-sylvatica",
+      "externalId": "408459459",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ginkgo-biloba",
+      "externalId": "250082860",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ginkgo-biloba",
+      "externalId": "250082872",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ginkgo-biloba",
+      "externalId": "250082883",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ilex-crenata",
+      "externalId": "179773847",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "juniperus-californica",
+      "externalId": "112356460",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "lagerstroemia-indica",
+      "externalId": "316841621",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "lagerstroemia-indica",
+      "externalId": "49881439",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "lagerstroemia-indica",
+      "externalId": "555795617",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "larix-kaempferi",
+      "externalId": "237071151",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "larix-kaempferi",
+      "externalId": "441276443",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "larix-kaempferi",
+      "externalId": "441276519",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "malus-halliana",
+      "externalId": "491548775",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "olea-europaea",
+      "externalId": "409846471",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "olea-europaea",
+      "externalId": "409846515",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "olea-europaea",
+      "externalId": "602303597",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "olea-europaea",
+      "externalId": "626427904",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "olea-europaea",
+      "externalId": "626429439",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "olea-europaea",
+      "externalId": "626429448",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "portulacaria-afra",
+      "externalId": "15615094",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "portulacaria-afra",
+      "externalId": "15615100",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "portulacaria-afra",
+      "externalId": "15615103",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "prunus-mume",
+      "externalId": "108752345",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "prunus-mume",
+      "externalId": "108752351",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "prunus-mume",
+      "externalId": "108752370",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "prunus-serrulata",
+      "externalId": "366717162",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "prunus-serrulata",
+      "externalId": "366717184",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "prunus-serrulata",
+      "externalId": "366717203",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "punica-granatum",
+      "externalId": "108473359",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "punica-granatum",
+      "externalId": "3600581",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "punica-granatum",
+      "externalId": "3600582",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "rhaphiolepis-indica",
+      "externalId": "138981682",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "rhaphiolepis-indica",
+      "externalId": "19041578",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "rhododendron-indicum",
+      "externalId": "260934558",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "rhododendron-indicum",
+      "externalId": "260934587",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "rhododendron-indicum",
+      "externalId": "445603754",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "taxodium-distichum",
+      "externalId": "251646155",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "taxodium-distichum",
+      "externalId": "251701859",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "taxodium-distichum",
+      "externalId": "251701861",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "taxodium-distichum",
+      "externalId": "251701863",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "taxodium-distichum",
+      "externalId": "94199870",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "taxus-cuspidata",
+      "externalId": "157727033",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "taxus-cuspidata",
+      "externalId": "157727053",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "taxus-cuspidata",
+      "externalId": "66051332",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "thuja",
+      "externalId": "258974747",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "thuja",
+      "externalId": "258974776",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "thuja",
+      "externalId": "258974790",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "thuja",
+      "externalId": "475655477",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "thuja",
+      "externalId": "475655609",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ulmus-parvifolia",
+      "externalId": "109074771",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ulmus-parvifolia",
+      "externalId": "109074775",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ulmus-parvifolia",
+      "externalId": "109074783",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ulmus-pumila",
+      "externalId": "650717255",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ulmus-pumila",
+      "externalId": "650717258",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ulmus-pumila",
+      "externalId": "650717264",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "zelkova-serrata",
+      "externalId": "241371269",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "zelkova-serrata",
+      "externalId": "2744956",
+      "reason": "Rejected in the local leaf review tool."
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "zelkova-serrata",
+      "externalId": "2744982",
+      "reason": "Rejected in the local leaf review tool."
+    }
+  ],
+  "manualCropBoxes": [
+    {
+      "sourceName": "inaturalist",
+      "slug": "acer-palmatum",
+      "externalId": "111390382",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        600,
+        708,
+        1400,
+        1505
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "acer-palmatum",
+      "externalId": "324775039",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        55,
+        778,
+        1080,
+        1805
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "acer-palmatum",
+      "externalId": "324775089",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        15,
+        935,
+        476,
+        1397
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "acer-palmatum",
+      "externalId": "324775188",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        1,
+        606,
+        903,
+        1510
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "camellia-japonica",
+      "externalId": "307161105",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        9,
+        189,
+        1242,
+        1423
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "camellia-japonica",
+      "externalId": "307167965",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        823,
+        1167,
+        1252,
+        1597
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "chaenomeles-japonica",
+      "externalId": "116039331",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        2,
+        471,
+        572,
+        1039
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "chaenomeles-japonica",
+      "externalId": "399400446",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        610,
+        423,
+        1093,
+        908
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "chaenomeles-japonica",
+      "externalId": "399400453",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        269,
+        13,
+        1006,
+        748
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "chaenomeles-japonica",
+      "externalId": "399400458",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        449,
+        158,
+        1152,
+        862
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "cotoneaster",
+      "externalId": "162485548",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        2,
+        453,
+        963,
+        1413
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "cotoneaster",
+      "externalId": "162485565",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        117,
+        1401,
+        762,
+        2048
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "cotoneaster",
+      "externalId": "162485585",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        0,
+        46,
+        490,
+        536
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "cotoneaster",
+      "externalId": "560296836",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        564,
+        306,
+        1590,
+        1331
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "cotoneaster",
+      "externalId": "560296846",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        405,
+        482,
+        1287,
+        1363
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "crassula-ovata",
+      "externalId": "15938889",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        7,
+        815,
+        550,
+        1358
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "crassula-ovata",
+      "externalId": "15938896",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        159,
+        410,
+        929,
+        1181
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "crassula-ovata",
+      "externalId": "161230628",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        453,
+        453,
+        915,
+        915
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "fagus-crenata",
+      "externalId": "403189525",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        923,
+        469,
+        1608,
+        1152
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "fagus-crenata",
+      "externalId": "403189545",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        725,
+        289,
+        1591,
+        1152
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "fagus-crenata",
+      "externalId": "7386112",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        646,
+        0,
+        1291,
+        644
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ficus-microcarpa",
+      "externalId": "133101294",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        623,
+        79,
+        2048,
+        1502
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ficus-microcarpa",
+      "externalId": "133101301",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        719,
+        240,
+        972,
+        493
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ficus-microcarpa",
+      "externalId": "133101309",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        377,
+        313,
+        1601,
+        1536
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ficus-microcarpa",
+      "externalId": "133101312",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        692,
+        197,
+        2033,
+        1536
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ficus-microcarpa",
+      "externalId": "203990531",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        524,
+        1087,
+        1474,
+        2037
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ficus-microcarpa",
+      "externalId": "369146317",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        619,
+        563,
+        1080,
+        1024
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ginkgo-biloba",
+      "externalId": "161263816",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        270,
+        953,
+        1282,
+        1967
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ginkgo-biloba",
+      "externalId": "27163508",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        184,
+        767,
+        591,
+        1175
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ginkgo-biloba",
+      "externalId": "46557155",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        359,
+        1033,
+        1255,
+        1928
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ilex-crenata",
+      "externalId": "179773837",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        105,
+        798,
+        1171,
+        1864
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ilex-crenata",
+      "externalId": "179773856",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        546,
+        222,
+        1472,
+        1148
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ilex-crenata",
+      "externalId": "179773864",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        450,
+        646,
+        1124,
+        1320
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ilex-crenata",
+      "externalId": "315720397",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        370,
+        133,
+        1692,
+        1454
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ilex-crenata",
+      "externalId": "349759560",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        291,
+        248,
+        1962,
+        1919
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "juniperus-californica",
+      "externalId": "112356471",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        231,
+        508,
+        873,
+        1150
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "juniperus-californica",
+      "externalId": "112356480",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        380,
+        825,
+        1183,
+        1629
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "juniperus-californica",
+      "externalId": "236117650",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        56,
+        400,
+        1240,
+        1584
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "juniperus-californica",
+      "externalId": "236124323",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        885,
+        366,
+        1542,
+        1023
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "juniperus-californica",
+      "externalId": "73243709",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        1271,
+        401,
+        2005,
+        1132
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "lagerstroemia-indica",
+      "externalId": "316841613",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        1301,
+        69,
+        1985,
+        753
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "lagerstroemia-indica",
+      "externalId": "316841640",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        610,
+        671,
+        1137,
+        1197
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "lagerstroemia-indica",
+      "externalId": "316841676",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        298,
+        262,
+        699,
+        663
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "larix-kaempferi",
+      "externalId": "441276476",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        1144,
+        1095,
+        1506,
+        1457
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "larix-kaempferi",
+      "externalId": "441276576",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        33,
+        154,
+        1536,
+        1654
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "larix-kaempferi",
+      "externalId": "493727216",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        933,
+        408,
+        2048,
+        1522
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "malus-halliana",
+      "externalId": "491548561",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        445,
+        370,
+        1536,
+        1462
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "malus-halliana",
+      "externalId": "491548682",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        724,
+        540,
+        1299,
+        1117
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "portulacaria-afra",
+      "externalId": "15615098",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        6,
+        903,
+        1151,
+        2048
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "portulacaria-afra",
+      "externalId": "387718905",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        216,
+        1091,
+        810,
+        1687
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "portulacaria-afra",
+      "externalId": "624135273",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        676,
+        1295,
+        1370,
+        1989
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "prunus-mume",
+      "externalId": "108752362",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        521,
+        369,
+        1431,
+        1036
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "prunus-mume",
+      "externalId": "108752374",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        604,
+        343,
+        1413,
+        1099
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "prunus-mume",
+      "externalId": "173122050",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        541,
+        275,
+        1479,
+        1123
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "prunus-serrulata",
+      "externalId": "366717168",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        314,
+        5,
+        1393,
+        1083
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "prunus-serrulata",
+      "externalId": "366717202",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        643,
+        190,
+        1840,
+        1389
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "prunus-serrulata",
+      "externalId": "366717210",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        495,
+        141,
+        1679,
+        1324
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "punica-granatum",
+      "externalId": "246756848",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        252,
+        6,
+        1469,
+        1221
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "punica-granatum",
+      "externalId": "246756915",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        617,
+        0,
+        1564,
+        946
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "rhaphiolepis-indica",
+      "externalId": "138981604",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        9,
+        731,
+        1146,
+        1869
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "rhaphiolepis-indica",
+      "externalId": "138981634",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        603,
+        336,
+        1306,
+        1041
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "rhaphiolepis-indica",
+      "externalId": "138981714",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        51,
+        1022,
+        917,
+        1891
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "rhaphiolepis-indica",
+      "externalId": "575797625",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        144,
+        551,
+        1285,
+        1695
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "rhododendron-indicum",
+      "externalId": "218398049",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        208,
+        1436,
+        549,
+        1776
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "rhododendron-indicum",
+      "externalId": "218398065",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        580,
+        358,
+        1152,
+        930
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "rhododendron-indicum",
+      "externalId": "445603809",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        8,
+        301,
+        891,
+        1185
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "taxodium-distichum",
+      "externalId": "2795369",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        406,
+        107,
+        1837,
+        1536
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "taxus-cuspidata",
+      "externalId": "157726996",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        538,
+        393,
+        1403,
+        1256
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "taxus-cuspidata",
+      "externalId": "55959799",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        212,
+        7,
+        1531,
+        1324
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "taxus-cuspidata",
+      "externalId": "66051268",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        588,
+        345,
+        1536,
+        1292
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "thuja",
+      "externalId": "258974756",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        390,
+        793,
+        965,
+        1368
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ulmus-parvifolia",
+      "externalId": "109074745",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        561,
+        196,
+        949,
+        583
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ulmus-parvifolia",
+      "externalId": "109074753",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        653,
+        541,
+        993,
+        881
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ulmus-parvifolia",
+      "externalId": "109074780",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        498,
+        947,
+        1012,
+        1459
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ulmus-pumila",
+      "externalId": "25953909",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        322,
+        111,
+        1080,
+        872
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ulmus-pumila",
+      "externalId": "454586043",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        105,
+        391,
+        1009,
+        1295
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "ulmus-pumila",
+      "externalId": "454586044",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        16,
+        108,
+        1102,
+        1193
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "zelkova-serrata",
+      "externalId": "17150707",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        408,
+        404,
+        1536,
+        1530
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "zelkova-serrata",
+      "externalId": "2744981",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        567,
+        205,
+        1627,
+        1262
+      ]
+    },
+    {
+      "sourceName": "inaturalist",
+      "slug": "zelkova-serrata",
+      "externalId": "371319088",
+      "reason": "Accepted in the local leaf review tool.",
+      "cropBox": [
+        1,
+        744,
+        1148,
+        1890
+      ]
+    }
+  ]
+}

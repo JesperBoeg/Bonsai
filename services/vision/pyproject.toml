@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bonsai-vision"
+version = "0.1.0"
+description = "Vision service for Bonsai tree recognition and future health analysis."
+requires-python = ">=3.13"
+dependencies = [
+  "fastapi>=0.115.0",
+  "numpy>=2.1.0",
+  "pillow>=11.0.0",
+  "pydantic>=2.9.0",
+  "python-multipart>=0.0.20",
+  "torch>=2.5.0",
+  "transformers>=5.0.0",
+  "uvicorn[standard]>=0.32.0"
+]

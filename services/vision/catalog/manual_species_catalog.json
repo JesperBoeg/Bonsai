@@ -1,0 +1,541 @@
+[
+  {
+    "slug": "azalea",
+    "label": "Azalea",
+    "subtitle": "Rhododendron spp.",
+    "aliases": ["Azalea", "Rhododendron", "Satsuki azalea", "Kurume azalea"],
+    "taxonRank": "genus"
+  },
+  {
+    "slug": "camellia-japonica",
+    "label": "Japanese camellia",
+    "subtitle": "Camellia japonica",
+    "aliases": ["Japanese camellia", "Camellia japonica", "Camellia"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "gardenia-jasminoides",
+    "label": "Cape jasmine",
+    "subtitle": "Gardenia jasminoides",
+    "aliases": ["Cape jasmine", "Gardenia", "Gardenia jasminoides"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "serissa-japonica",
+    "label": "Snowrose",
+    "subtitle": "Serissa japonica",
+    "aliases": ["Snowrose", "Serissa japonica", "Serissa foetida", "Tree of a thousand stars"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "ehretia-microphylla",
+    "label": "Fukien tea",
+    "subtitle": "Ehretia microphylla",
+    "aliases": ["Fukien tea", "Ehretia microphylla", "Carmona retusa", "Carmona microphylla"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "schefflera-arboricola",
+    "label": "Dwarf umbrella tree",
+    "subtitle": "Schefflera arboricola",
+    "aliases": ["Dwarf umbrella tree", "Schefflera arboricola", "Umbrella tree"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "wrightia-religiosa",
+    "label": "Water jasmine",
+    "subtitle": "Wrightia religiosa",
+    "aliases": ["Water jasmine", "Wrightia religiosa"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "murraya-paniculata",
+    "label": "Orange jasmine",
+    "subtitle": "Murraya paniculata",
+    "aliases": ["Orange jasmine", "Murraya paniculata", "Mock orange"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "duranta-erecta",
+    "label": "Golden dewdrop",
+    "subtitle": "Duranta erecta",
+    "aliases": ["Golden dewdrop", "Duranta erecta", "Skyflower"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "syzygium-paniculatum",
+    "label": "Brush cherry",
+    "subtitle": "Syzygium paniculatum",
+    "aliases": ["Brush cherry", "Syzygium paniculatum", "Eugenia myrtifolia", "Australian brush cherry"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "plinia-cauliflora",
+    "label": "Jaboticaba",
+    "subtitle": "Plinia cauliflora",
+    "aliases": ["Jaboticaba", "Plinia cauliflora", "Myrciaria cauliflora", "Brazilian grape tree"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "adenium-obesum",
+    "label": "Desert rose",
+    "subtitle": "Adenium obesum",
+    "aliases": ["Desert rose", "Adenium obesum"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "operculicarya-decaryi",
+    "label": "Elephant tree",
+    "subtitle": "Operculicarya decaryi",
+    "aliases": ["Elephant tree", "Operculicarya decaryi"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "buxus-harlandii",
+    "label": "Harland boxwood",
+    "subtitle": "Buxus harlandii",
+    "aliases": ["Harland boxwood", "Buxus harlandii"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "buxus-sempervirens",
+    "label": "Common box",
+    "subtitle": "Buxus sempervirens",
+    "aliases": ["Common box", "Boxwood", "Buxus sempervirens"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "ligustrum-sinense",
+    "label": "Chinese privet",
+    "subtitle": "Ligustrum sinense",
+    "aliases": ["Chinese privet", "Ligustrum sinense"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "ligustrum-japonicum",
+    "label": "Japanese privet",
+    "subtitle": "Ligustrum japonicum",
+    "aliases": ["Japanese privet", "Ligustrum japonicum", "Waxleaf privet"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "ilex-crenata",
+    "label": "Japanese holly",
+    "subtitle": "Ilex crenata",
+    "aliases": ["Japanese holly", "Ilex crenata", "Box-leaved holly"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "ilex-serrata",
+    "label": "Japanese winterberry",
+    "subtitle": "Ilex serrata",
+    "aliases": ["Japanese winterberry", "Ilex serrata", "Winterberry holly"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "pyracantha-coccinea",
+    "label": "Scarlet firethorn",
+    "subtitle": "Pyracantha coccinea",
+    "aliases": ["Scarlet firethorn", "Firethorn", "Pyracantha coccinea"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "chaenomeles-japonica",
+    "label": "Japanese quince",
+    "subtitle": "Chaenomeles japonica",
+    "aliases": ["Japanese quince", "Chaenomeles japonica"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "chaenomeles-speciosa",
+    "label": "Flowering quince",
+    "subtitle": "Chaenomeles speciosa",
+    "aliases": ["Flowering quince", "Chaenomeles speciosa", "Chinese flowering quince"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "pseudocydonia-sinensis",
+    "label": "Chinese quince",
+    "subtitle": "Pseudocydonia sinensis",
+    "aliases": ["Chinese quince", "Pseudocydonia sinensis"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "cydonia-oblonga",
+    "label": "Common quince",
+    "subtitle": "Cydonia oblonga",
+    "aliases": ["Common quince", "Quince", "Cydonia oblonga"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "malus-halliana",
+    "label": "Hall crabapple",
+    "subtitle": "Malus halliana",
+    "aliases": ["Hall crabapple", "Malus halliana"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "malus-floribunda",
+    "label": "Japanese crabapple",
+    "subtitle": "Malus floribunda",
+    "aliases": ["Japanese crabapple", "Malus floribunda"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "malus-domestica",
+    "label": "Apple",
+    "subtitle": "Malus domestica",
+    "aliases": ["Apple", "Malus domestica"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "prunus-mume",
+    "label": "Japanese apricot",
+    "subtitle": "Prunus mume",
+    "aliases": ["Japanese apricot", "Prunus mume", "Ume"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "prunus-serrulata",
+    "label": "Japanese cherry",
+    "subtitle": "Prunus serrulata",
+    "aliases": ["Japanese cherry", "Prunus serrulata", "Flowering cherry"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "prunus-incisa",
+    "label": "Fuji cherry",
+    "subtitle": "Prunus incisa",
+    "aliases": ["Fuji cherry", "Prunus incisa"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "crataegus-monogyna",
+    "label": "Common hawthorn",
+    "subtitle": "Crataegus monogyna",
+    "aliases": ["Common hawthorn", "Crataegus monogyna", "Single-seed hawthorn"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "carpinus-coreana",
+    "label": "Korean hornbeam",
+    "subtitle": "Carpinus coreana",
+    "aliases": ["Korean hornbeam", "Carpinus coreana"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "carpinus-japonica",
+    "label": "Japanese hornbeam",
+    "subtitle": "Carpinus japonica",
+    "aliases": ["Japanese hornbeam", "Carpinus japonica"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "carpinus-betulus",
+    "label": "European hornbeam",
+    "subtitle": "Carpinus betulus",
+    "aliases": ["European hornbeam", "Carpinus betulus", "Hornbeam"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "fagus-sylvatica",
+    "label": "European beech",
+    "subtitle": "Fagus sylvatica",
+    "aliases": ["European beech", "Fagus sylvatica", "Beech"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "quercus-suber",
+    "label": "Cork oak",
+    "subtitle": "Quercus suber",
+    "aliases": ["Cork oak", "Quercus suber"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "quercus-robur",
+    "label": "English oak",
+    "subtitle": "Quercus robur",
+    "aliases": ["English oak", "Quercus robur", "Pedunculate oak"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "quercus-serrata",
+    "label": "Konara oak",
+    "subtitle": "Quercus serrata",
+    "aliases": ["Konara oak", "Quercus serrata", "Japanese oak"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "celtis-sinensis",
+    "label": "Chinese hackberry",
+    "subtitle": "Celtis sinensis",
+    "aliases": ["Chinese hackberry", "Celtis sinensis"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "stewartia-pseudocamellia",
+    "label": "Japanese stewartia",
+    "subtitle": "Stewartia pseudocamellia",
+    "aliases": ["Japanese stewartia", "Stewartia pseudocamellia"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "diospyros-rhombifolia",
+    "label": "Princess persimmon",
+    "subtitle": "Diospyros rhombifolia",
+    "aliases": ["Princess persimmon", "Diospyros rhombifolia"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "diospyros-kaki",
+    "label": "Japanese persimmon",
+    "subtitle": "Diospyros kaki",
+    "aliases": ["Japanese persimmon", "Persimmon", "Diospyros kaki"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "zanthoxylum-piperitum",
+    "label": "Japanese pepper",
+    "subtitle": "Zanthoxylum piperitum",
+    "aliases": ["Japanese pepper", "Zanthoxylum piperitum", "Japanese prickly ash"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "olea-europaea",
+    "label": "Olive",
+    "subtitle": "Olea europaea",
+    "aliases": ["Olive", "European olive", "Olea europaea"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "myrtus-communis",
+    "label": "Myrtle",
+    "subtitle": "Myrtus communis",
+    "aliases": ["Myrtle", "Common myrtle", "Myrtus communis"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "tamarix-parviflora",
+    "label": "Smallflower tamarisk",
+    "subtitle": "Tamarix parviflora",
+    "aliases": ["Smallflower tamarisk", "Tamarix parviflora", "Tamarisk"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "berberis-thunbergii",
+    "label": "Japanese barberry",
+    "subtitle": "Berberis thunbergii",
+    "aliases": ["Japanese barberry", "Berberis thunbergii", "Barberry"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "wisteria-sinensis",
+    "label": "Chinese wisteria",
+    "subtitle": "Wisteria sinensis",
+    "aliases": ["Chinese wisteria", "Wisteria sinensis"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "metasequoia-glyptostroboides",
+    "label": "Dawn redwood",
+    "subtitle": "Metasequoia glyptostroboides",
+    "aliases": ["Dawn redwood", "Metasequoia glyptostroboides"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "larix-kaempferi",
+    "label": "Japanese larch",
+    "subtitle": "Larix kaempferi",
+    "aliases": ["Japanese larch", "Larix kaempferi"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "larix-decidua",
+    "label": "European larch",
+    "subtitle": "Larix decidua",
+    "aliases": ["European larch", "Larix decidua", "Larch"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "cryptomeria-japonica",
+    "label": "Japanese cedar",
+    "subtitle": "Cryptomeria japonica",
+    "aliases": ["Japanese cedar", "Cryptomeria japonica", "Sugi"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "taxus-cuspidata",
+    "label": "Japanese yew",
+    "subtitle": "Taxus cuspidata",
+    "aliases": ["Japanese yew", "Taxus cuspidata"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "taxus-baccata",
+    "label": "English yew",
+    "subtitle": "Taxus baccata",
+    "aliases": ["English yew", "Taxus baccata", "European yew"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "pseudolarix-amabilis",
+    "label": "Golden larch",
+    "subtitle": "Pseudolarix amabilis",
+    "aliases": ["Golden larch", "Pseudolarix amabilis"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "pinus-parviflora",
+    "label": "Japanese white pine",
+    "subtitle": "Pinus parviflora",
+    "aliases": ["Japanese white pine", "Pinus parviflora"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "pinus-densiflora",
+    "label": "Japanese red pine",
+    "subtitle": "Pinus densiflora",
+    "aliases": ["Japanese red pine", "Pinus densiflora"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "pinus-sylvestris",
+    "label": "Scots pine",
+    "subtitle": "Pinus sylvestris",
+    "aliases": ["Scots pine", "Scotch pine", "Pinus sylvestris"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "pinus-mugo",
+    "label": "Mugo pine",
+    "subtitle": "Pinus mugo",
+    "aliases": ["Mugo pine", "Pinus mugo", "Mountain pine"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "juniperus-communis",
+    "label": "Common juniper",
+    "subtitle": "Juniperus communis",
+    "aliases": ["Common juniper", "Juniperus communis"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "juniperus-squamata",
+    "label": "Flaky juniper",
+    "subtitle": "Juniperus squamata",
+    "aliases": ["Flaky juniper", "Juniperus squamata", "Blue star juniper"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "juniperus-virginiana",
+    "label": "Eastern red cedar",
+    "subtitle": "Juniperus virginiana",
+    "aliases": ["Eastern red cedar", "Juniperus virginiana", "Red cedar"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "cupressus-macrocarpa",
+    "label": "Monterey cypress",
+    "subtitle": "Cupressus macrocarpa",
+    "aliases": ["Monterey cypress", "Cupressus macrocarpa", "Lemon cypress"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "cupressus-sempervirens",
+    "label": "Italian cypress",
+    "subtitle": "Cupressus sempervirens",
+    "aliases": ["Italian cypress", "Cupressus sempervirens", "Mediterranean cypress"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "platycladus-orientalis",
+    "label": "Chinese arborvitae",
+    "subtitle": "Platycladus orientalis",
+    "aliases": ["Chinese arborvitae", "Platycladus orientalis", "Oriental arborvitae", "Thuja orientalis"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "thuja-occidentalis",
+    "label": "American arborvitae",
+    "subtitle": "Thuja occidentalis",
+    "aliases": ["American arborvitae", "Thuja occidentalis", "Northern white cedar"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "ficus-microcarpa",
+    "label": "Chinese banyan",
+    "subtitle": "Ficus microcarpa",
+    "aliases": ["Chinese banyan", "Ficus microcarpa", "Indian laurel fig"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "ficus-benjamina",
+    "label": "Weeping fig",
+    "subtitle": "Ficus benjamina",
+    "aliases": ["Weeping fig", "Ficus benjamina"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "ficus-religiosa",
+    "label": "Sacred fig",
+    "subtitle": "Ficus religiosa",
+    "aliases": ["Sacred fig", "Ficus religiosa", "Bo tree"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "ulmus-minor",
+    "label": "Field elm",
+    "subtitle": "Ulmus minor",
+    "aliases": ["Field elm", "Ulmus minor", "English elm"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "ulmus-pumila",
+    "label": "Siberian elm",
+    "subtitle": "Ulmus pumila",
+    "aliases": ["Siberian elm", "Ulmus pumila"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "acer-ginnala",
+    "label": "Amur maple",
+    "subtitle": "Acer ginnala",
+    "aliases": ["Amur maple", "Acer ginnala"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "acer-campestre",
+    "label": "Field maple",
+    "subtitle": "Acer campestre",
+    "aliases": ["Field maple", "Acer campestre", "Hedge maple"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "acer-monspessulanum",
+    "label": "Montpellier maple",
+    "subtitle": "Acer monspessulanum",
+    "aliases": ["Montpellier maple", "Acer monspessulanum"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "sageretia-theezans",
+    "label": "Chinese sweet plum",
+    "subtitle": "Sageretia theezans",
+    "aliases": ["Chinese sweet plum", "Sageretia theezans"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "premna-serratifolia",
+    "label": "Premna",
+    "subtitle": "Premna serratifolia",
+    "aliases": ["Premna", "Premna serratifolia"],
+    "taxonRank": "species"
+  },
+  {
+    "slug": "pithecellobium-tortum",
+    "label": "Brazilian rain tree",
+    "subtitle": "Pithecellobium tortum",
+    "aliases": ["Brazilian rain tree", "Pithecellobium tortum", "Rain tree"],
+    "taxonRank": "species"
+  }
+]

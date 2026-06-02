@@ -1,0 +1,7 @@
+{
+  "notes": [
+    "This queue contains candidate leaf patches that require explicit review before entering the runtime index.",
+    "Use open_license_leaf_review_overrides.json to approve or reject specific ids, then rerun build_reviewed_open_license_leaf_index.py."
+  ],
+  "entries": []
+}

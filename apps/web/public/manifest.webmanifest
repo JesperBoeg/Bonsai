@@ -1,0 +1,9 @@
+{
+  "name": "Bonsai",
+  "short_name": "Bonsai",
+  "description": "Track individual bonsai trees and their photo history.",
+  "display": "standalone",
+  "background_color": "#f5f0e8",
+  "theme_color": "#2c4a38",
+  "start_url": "/"
+}

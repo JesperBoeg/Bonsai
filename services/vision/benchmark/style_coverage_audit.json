@@ -1,0 +1,174 @@
+{
+  "style_label_count": 15,
+  "eligible_style_label_count": 6,
+  "unsupported_style_label_count": 9,
+  "minimum_total_additional_distinct_trees_required": 17,
+  "notes": [
+    "Current reviewed style benchmark requires at least 3 distinct trees per style label.",
+    "Because the reviewed catalog currently has one image per tree, each additional reviewed image must come from a different tree to improve benchmark eligibility."
+  ],
+  "eligible_labels": [
+    {
+      "label": "Broom (Hokidachi)",
+      "current_reviewed_tree_count": 6,
+      "current_entry_ids": [
+        "maple-japanese-2011",
+        "maple-trident-52",
+        "elm-ulmus-bbg",
+        "elm-zelkova-16",
+        "beech-japanese-105",
+        "hokidachi-photo"
+      ],
+      "minimum_additional_distinct_trees_required": 0
+    },
+    {
+      "label": "Forest (Yose-ue)",
+      "current_reviewed_tree_count": 4,
+      "current_entry_ids": [
+        "cypress-bald-national-museum",
+        "spruce-black-hills-forest",
+        "juniper-foemina-stierch-a",
+        "maple-trident-203-a"
+      ],
+      "minimum_additional_distinct_trees_required": 0
+    },
+    {
+      "label": "Formal upright (Chokkan)",
+      "current_reviewed_tree_count": 7,
+      "current_entry_ids": [
+        "juniper-foemina-oct-2008",
+        "juniper-foemina-dec-2008",
+        "cypress-japan-bartusek",
+        "cypress-d1207",
+        "podocarpus-5zz",
+        "ficus-formal-upright",
+        "pine-pescia-chokkan"
+      ],
+      "minimum_additional_distinct_trees_required": 0
+    },
+    {
+      "label": "Informal upright (Moyogi)",
+      "current_reviewed_tree_count": 17,
+      "current_entry_ids": [
+        "juniper-dwarf-museum",
+        "maple-fan-informal",
+        "elm-chinese-111",
+        "beech-korean",
+        "beech-american-272",
+        "beech-fagus-crenata-2023",
+        "beech-fagus-sylvatica-vladka",
+        "podocarpus-macrophyllus-generic",
+        "podocarpus-pescia-moyogi-01",
+        "citrus-bbg-informal",
+        "hawthorn-pescia-moyogi",
+        "psidium-informal",
+        "hawthorn-english-1953-2007",
+        "spruce-ezo-museum",
+        "lilac-bonzai-5925385130",
+        "japanese-wisteria-1925-2007",
+        "bougainvillea-glabra-9zz"
+      ],
+      "minimum_additional_distinct_trees_required": 0
+    },
+    {
+      "label": "Literati (Bunjingi)",
+      "current_reviewed_tree_count": 5,
+      "current_entry_ids": [
+        "cypress-obtusa-literati",
+        "cypress-pisifera-boulevard",
+        "ficus-deltoidea-literati",
+        "pine-black-135-literati",
+        "juniper-california-220"
+      ],
+      "minimum_additional_distinct_trees_required": 0
+    },
+    {
+      "label": "Slanting (Shakan)",
+      "current_reviewed_tree_count": 6,
+      "current_entry_ids": [
+        "juniper-pescia-shakan",
+        "juniper-garden-juniper",
+        "punica-slanting",
+        "thuja-slanting",
+        "hawthorn-crataegus-2023",
+        "spruce-filoli"
+      ],
+      "minimum_additional_distinct_trees_required": 0
+    }
+  ],
+  "unsupported_labels": [
+    {
+      "label": "Cascade (Kengai)",
+      "current_reviewed_tree_count": 2,
+      "current_entry_ids": [
+        "cotoneaster-cascade",
+        "carissa-cascade"
+      ],
+      "minimum_additional_distinct_trees_required": 1
+    },
+    {
+      "label": "Double trunk (Sokan)",
+      "current_reviewed_tree_count": 1,
+      "current_entry_ids": [
+        "portulacaria-afra-2"
+      ],
+      "minimum_additional_distinct_trees_required": 2
+    },
+    {
+      "label": "Growing in rock (Ishisuki)",
+      "current_reviewed_tree_count": 1,
+      "current_entry_ids": [
+        "juniper-kishu-ishizuki"
+      ],
+      "minimum_additional_distinct_trees_required": 2
+    },
+    {
+      "label": "Growing on rock (Seki-joju)",
+      "current_reviewed_tree_count": 1,
+      "current_entry_ids": [
+        "maple-trident-plain"
+      ],
+      "minimum_additional_distinct_trees_required": 2
+    },
+    {
+      "label": "Multi-trunk (Kabudachi)",
+      "current_reviewed_tree_count": 1,
+      "current_entry_ids": [
+        "maple-japanese-40"
+      ],
+      "minimum_additional_distinct_trees_required": 2
+    },
+    {
+      "label": "Raft (Ikadabuki)",
+      "current_reviewed_tree_count": 1,
+      "current_entry_ids": [
+        "elm-lacebark-clump-raft"
+      ],
+      "minimum_additional_distinct_trees_required": 2
+    },
+    {
+      "label": "Semi-cascade (Han-kengai)",
+      "current_reviewed_tree_count": 1,
+      "current_entry_ids": [
+        "cotoneaster-semi-cascade"
+      ],
+      "minimum_additional_distinct_trees_required": 2
+    },
+    {
+      "label": "Shari deadwood (Sharimiki)",
+      "current_reviewed_tree_count": 1,
+      "current_entry_ids": [
+        "juniper-dwarf-deadwood-1975-2007"
+      ],
+      "minimum_additional_distinct_trees_required": 2
+    },
+    {
+      "label": "Windswept (Fukinagashi)",
+      "current_reviewed_tree_count": 1,
+      "current_entry_ids": [
+        "spruce-picea-abies-2023"
+      ],
+      "minimum_additional_distinct_trees_required": 2
+    }
+  ]
+}

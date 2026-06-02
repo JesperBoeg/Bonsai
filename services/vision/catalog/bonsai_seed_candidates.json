@@ -1,0 +1,402 @@
+[
+  {
+    "id": "juniper-foemina-oct-2008",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Foemina_Juniper_bonsai_224,_October_10,_2008.jpg",
+    "source_query": "bonsai formal upright",
+    "candidate_for": ["species", "style"],
+    "species_label": "Juniperus spp.",
+    "style_label": "Formal upright (Chokkan)",
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "juniper-foemina-dec-2008",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Foemina_Juniper_bonsai_224,_December_24,_2008.jpg",
+    "source_query": "bonsai formal upright",
+    "candidate_for": ["species", "style"],
+    "species_label": "Juniperus spp.",
+    "style_label": "Formal upright (Chokkan)",
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "juniper-pescia-shakan",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Pescia,_museo_del_bonsai,_juniperus_chinensis,_stile_shakan_(inclinato),_dalla_cina,_circa_50_anni.jpg",
+    "source_query": "bonsai shakan",
+    "candidate_for": ["species", "style"],
+    "species_label": "Juniperus chinensis",
+    "style_label": "Slanting (Shakan)",
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "juniper-garden-juniper",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Bonzai_Japanese_Garden_Juniper_(3889932708).jpg",
+    "source_query": "bonsai japanese garden juniper",
+    "candidate_for": ["species"],
+    "species_label": "Juniperus procumbens",
+    "style_label": null,
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "juniper-variegated",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Bonsai_-_Juniper,_variegated.jpg",
+    "source_query": "bonsai juniper",
+    "candidate_for": ["species"],
+    "species_label": "Juniperus spp.",
+    "style_label": null,
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "maple-trident-plain",
+    "page_url": "https://commons.wikimedia.org/wiki/File:BonsaiTridentMaple.jpg",
+    "source_query": "bonsai trident maple",
+    "candidate_for": ["species"],
+    "species_label": "Acer buergerianum",
+    "style_label": null,
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "maple-trident-203-a",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Trident_Maple_bonsai_203,_May_29,_2011_a_-_Stierch.jpg",
+    "source_query": "bonsai maple",
+    "candidate_for": ["species"],
+    "species_label": "Acer buergerianum",
+    "style_label": null,
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "maple-japanese-2011",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Japanese_Maple_bonsai,_2011-05-29.jpg",
+    "source_query": "bonsai japanese maple",
+    "candidate_for": ["species"],
+    "species_label": "Acer palmatum",
+    "style_label": null,
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "maple-japanese-40",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Japanese_Maple_bonsai_40,_December_24,_2008.jpg",
+    "source_query": "bonsai japanese maple",
+    "candidate_for": ["species"],
+    "species_label": "Acer palmatum",
+    "style_label": null,
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "maple-trident-52",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Trident_Maple_bonsai_52,_October_10,_2008.jpg",
+    "source_query": "bonsai slanting",
+    "candidate_for": ["species", "style"],
+    "species_label": "Acer buergerianum",
+    "style_label": "Slanting (Shakan)",
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "elm-chinese-110",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Chinese_Elm_bonsai_110,_December_24,_2008.jpg",
+    "source_query": "bonsai chinese elm",
+    "candidate_for": ["species", "style"],
+    "species_label": "Ulmus parvifolia",
+    "style_label": "Slanting (Shakan)",
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "elm-chinese-111",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Chinese_Elm_bonsai_111,_December_24,_2008.jpg",
+    "source_query": "bonsai chinese elm",
+    "candidate_for": ["species"],
+    "species_label": "Ulmus parvifolia",
+    "style_label": null,
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "elm-chinese-generic",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Chinese_elm_bonsai.JPG",
+    "source_query": "bonsai chinese elm",
+    "candidate_for": ["species"],
+    "species_label": "Ulmus parvifolia",
+    "style_label": null,
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "elm-ulmus-bbg",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Ulmus_parvifolia_bonsai_at_the_BBG,_August_2,_2008.jpg",
+    "source_query": "bonsai broom zelkova",
+    "candidate_for": ["species", "style"],
+    "species_label": "Ulmus parvifolia",
+    "style_label": "Broom (Hokidachi)",
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "elm-zelkova-16",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Japanese_Zelkova_bonsai_16,_October_10,_2008.jpg",
+    "source_query": "bonsai broom zelkova",
+    "candidate_for": ["species", "style"],
+    "species_label": "Zelkova serrata",
+    "style_label": "Broom (Hokidachi)",
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "beech-korean",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Korean_Beech_Bonsai_Tree.jpg",
+    "source_query": "bonsai beech",
+    "candidate_for": ["species"],
+    "species_label": "Fagus spp.",
+    "style_label": null,
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "beech-american-272",
+    "page_url": "https://commons.wikimedia.org/wiki/File:American_Beech_bonsai_272,_October_10,_2008.jpg",
+    "source_query": "bonsai beech",
+    "candidate_for": ["species"],
+    "species_label": "Fagus grandifolia",
+    "style_label": null,
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "beech-japanese-105",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Japanese_Beech_2015-06_105.jpg",
+    "source_query": "bonsai beech",
+    "candidate_for": ["species"],
+    "species_label": "Fagus crenata",
+    "style_label": null,
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "beech-japanese-106",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Japanese_Beech_2015-06_106.jpg",
+    "source_query": "bonsai beech",
+    "candidate_for": ["species"],
+    "species_label": "Fagus crenata",
+    "style_label": null,
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "beech-fagus-crenata-2023",
+    "page_url": "https://commons.wikimedia.org/wiki/File:2023_Bonsai_Fagus_Crenata_Josef_Panik.jpg",
+    "source_query": "bonsai beech",
+    "candidate_for": ["species"],
+    "species_label": "Fagus crenata",
+    "style_label": null,
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "cypress-japan-bartusek",
+    "page_url": "https://commons.wikimedia.org/wiki/File:8._Jap%C3%A1n_ciprus_-_bonsai,_Bartusek_L%C3%A1szl%C3%B3.JPG",
+    "source_query": "bonsai formal upright",
+    "candidate_for": ["species", "style"],
+    "species_label": "Chamaecyparis spp.",
+    "style_label": "Formal upright (Chokkan)",
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "cypress-d1207",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Cypress_bonsai_D1207.jpg",
+    "source_query": "bonsai cypress",
+    "candidate_for": ["species"],
+    "species_label": "Cupressaceae spp.",
+    "style_label": null,
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "cypress-d260107",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Cypress_bonsai_D260107.jpg",
+    "source_query": "bonsai cypress",
+    "candidate_for": ["species"],
+    "species_label": "Cupressaceae spp.",
+    "style_label": null,
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "cypress-bald-national-museum",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Bald_Cypress_-_National_Bonsai_%26_Penjing_Museum_-_Washington,_D.C._-_Sarah_Stierch.jpg",
+    "source_query": "bonsai cypress",
+    "candidate_for": ["species"],
+    "species_label": "Taxodium distichum",
+    "style_label": null,
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "cypress-obtusa-literati",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Chamaecyparis_obtusa_bonsai,_Longwood_Gardens_2023.jpg",
+    "source_query": "bonsai literati",
+    "candidate_for": ["species", "style"],
+    "species_label": "Chamaecyparis obtusa",
+    "style_label": "Literati (Bunjingi)",
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "podocarpus-generic",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Bonsai_de_Podocarpus.jpg",
+    "source_query": "bonsai podocarpus",
+    "candidate_for": ["species"],
+    "species_label": "Podocarpus macrophyllus",
+    "style_label": null,
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "podocarpus-macrophyllus-generic",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Podocarpus_macrophyllus_bonsai.jpg",
+    "source_query": "bonsai podocarpus",
+    "candidate_for": ["species"],
+    "species_label": "Podocarpus macrophyllus",
+    "style_label": null,
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "podocarpus-pescia-moyogi-01",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Pescia,_museo_del_bonsai,_podocarpus_macrophyllus,_stile_moyogi_(eretto_informale),_dalla_cina,_circa_70_anni_01.jpg",
+    "source_query": "bonsai informal upright",
+    "candidate_for": ["species", "style"],
+    "species_label": "Podocarpus macrophyllus",
+    "style_label": "Informal upright (Moyogi)",
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "podocarpus-pescia-moyogi-02",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Pescia,_museo_del_bonsai,_podocarpus_macrophyllus,_stile_moyogi_(eretto_informale),_dalla_cina,_circa_70_anni_02.jpg",
+    "source_query": "bonsai informal upright",
+    "candidate_for": ["species", "style"],
+    "species_label": "Podocarpus macrophyllus",
+    "style_label": "Informal upright (Moyogi)",
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "podocarpus-5zz",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Podocarpus_macrophyllus_5zz.jpg",
+    "source_query": "bonsai podocarpus macrophyllus",
+    "candidate_for": ["species"],
+    "species_label": "Podocarpus macrophyllus",
+    "style_label": null,
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "ficus-formal-upright",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Formal_Upright_Ficus_Bonsai.jpg",
+    "source_query": "bonsai formal upright",
+    "candidate_for": ["style"],
+    "species_label": "Ficus spp.",
+    "style_label": "Formal upright (Chokkan)",
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "pine-pescia-chokkan",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Pescia,_museo_del_bonsai,_pinus_halepensisa,_stile_chokkan_(eretto_formale),_da_italia,_circa_60_anni.jpg",
+    "source_query": "bonsai chokkan",
+    "candidate_for": ["style"],
+    "species_label": "Pinus spp.",
+    "style_label": "Formal upright (Chokkan)",
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "citrus-bbg-informal",
+    "page_url": "https://commons.wikimedia.org/wiki/File:BBG_-_Citrus_x_limonia_-_Informal_upright.jpg",
+    "source_query": "bonsai informal upright",
+    "candidate_for": ["style"],
+    "species_label": "Citrus spp.",
+    "style_label": "Informal upright (Moyogi)",
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "hawthorn-pescia-moyogi",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Pescia,_museo_del_bonsai,_Crataegus_sp._stile_moyogi_(eretto_informale),_con_frutti.jpg",
+    "source_query": "bonsai informal upright",
+    "candidate_for": ["style"],
+    "species_label": "Crataegus spp.",
+    "style_label": "Informal upright (Moyogi)",
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "ficus-deltoidea-literati",
+    "page_url": "https://commons.wikimedia.org/wiki/File:BBG_-_Ficus_deltoidea_-_Literati.jpg",
+    "source_query": "bonsai literati",
+    "candidate_for": ["style"],
+    "species_label": "Ficus deltoidea",
+    "style_label": "Literati (Bunjingi)",
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "hokidachi-photo",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Hokidachi.jpg",
+    "source_query": "bonsai hokidachi",
+    "candidate_for": ["style"],
+    "species_label": null,
+    "style_label": "Broom (Hokidachi)",
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "cotoneaster-cascade",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Cotoneaster_Cascade_Bonsai.jpg",
+    "source_query": "bonsai cascade",
+    "candidate_for": ["style"],
+    "species_label": "Cotoneaster spp.",
+    "style_label": "Cascade (Kengai)",
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "cotoneaster-semi-cascade",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Semi-cascade_cotoneaster_bonsai.jpg",
+    "source_query": "bonsai semi cascade",
+    "candidate_for": ["style"],
+    "species_label": "Cotoneaster spp.",
+    "style_label": "Semi-cascade (Han-kengai)",
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "carissa-cascade",
+    "page_url": "https://commons.wikimedia.org/wiki/File:BBG_-_Carissa_macrocarpa_var._Horizontalis_-_Cascade_by_Frank_Okamura.jpg",
+    "source_query": "bonsai cascade",
+    "candidate_for": ["style"],
+    "species_label": "Carissa macrocarpa",
+    "style_label": "Cascade (Kengai)",
+    "review_status": "pending",
+    "review_notes": ""
+  },
+  {
+    "id": "han-kengai-reference",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Bonsai_Semi-Cascade-_Han-_Kengai.jpg",
+    "source_query": "bonsai semi cascade",
+    "candidate_for": ["style"],
+    "species_label": null,
+    "style_label": "Semi-cascade (Han-kengai)",
+    "review_status": "pending",
+    "review_notes": ""
+  }
+]

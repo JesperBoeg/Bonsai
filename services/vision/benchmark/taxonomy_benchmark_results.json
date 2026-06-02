@@ -1,0 +1,183 @@
+{
+  "split_manifest": "benchmark/taxonomy_splits.json",
+  "encoders": {
+    "dinov2-base-pooler": {
+      "encoder": "dinov2-base-pooler",
+      "style_geometry_weight": 0.4,
+      "species": {
+        "train_count": 5,
+        "validation_count": 5,
+        "test_count": 5,
+        "eligible_label_count": 5,
+        "excluded_label_count": 35,
+        "validation": {
+          "count": 5,
+          "top1_accuracy": 0.4,
+          "top3_accuracy": 0.8,
+          "first_top3_failures": [
+            {
+              "id": "maple-japanese-40",
+              "expected": "Japanese maple",
+              "predicted": [
+                "Foemina juniper",
+                "Trident maple",
+                "Chinese elm"
+              ],
+              "top_matches": [
+                {
+                  "id": "juniper-foemina-stierch-a",
+                  "label": "Foemina juniper",
+                  "score": 0.772492
+                },
+                {
+                  "id": "maple-trident-plain",
+                  "label": "Trident maple",
+                  "score": 0.713284
+                },
+                {
+                  "id": "elm-ulmus-bbg",
+                  "label": "Chinese elm",
+                  "score": 0.64105
+                }
+              ]
+            }
+          ]
+        },
+        "test": {
+          "count": 5,
+          "top1_accuracy": 0.8,
+          "top3_accuracy": 1.0,
+          "first_top3_failures": []
+        }
+      },
+      "style": {
+        "train_count": 29,
+        "validation_count": 8,
+        "test_count": 8,
+        "eligible_label_count": 6,
+        "excluded_label_count": 9,
+        "validation": {
+          "count": 8,
+          "top1_accuracy": 0.25,
+          "top3_accuracy": 0.75,
+          "first_top3_failures": [
+            {
+              "id": "ficus-deltoidea-literati",
+              "expected": "Literati (Bunjingi)",
+              "predicted": [
+                "Informal upright (Moyogi)",
+                "Formal upright (Chokkan)",
+                "Slanting (Shakan)"
+              ],
+              "top_matches": [
+                {
+                  "id": "psidium-informal",
+                  "label": "Informal upright (Moyogi)",
+                  "score": 0.746554
+                },
+                {
+                  "id": "beech-korean",
+                  "label": "Informal upright (Moyogi)",
+                  "score": 0.738209
+                },
+                {
+                  "id": "punica-slanting",
+                  "label": "Slanting (Shakan)",
+                  "score": 0.712867
+                }
+              ]
+            },
+            {
+              "id": "maple-trident-203-a",
+              "expected": "Forest (Yose-ue)",
+              "predicted": [
+                "Informal upright (Moyogi)",
+                "Broom (Hokidachi)"
+              ],
+              "top_matches": [
+                {
+                  "id": "maple-fan-informal",
+                  "label": "Informal upright (Moyogi)",
+                  "score": 0.847434
+                },
+                {
+                  "id": "beech-japanese-105",
+                  "label": "Broom (Hokidachi)",
+                  "score": 0.796583
+                },
+                {
+                  "id": "beech-american-272",
+                  "label": "Informal upright (Moyogi)",
+                  "score": 0.768295
+                }
+              ]
+            }
+          ]
+        },
+        "test": {
+          "count": 8,
+          "top1_accuracy": 0.375,
+          "top3_accuracy": 0.75,
+          "first_top3_failures": [
+            {
+              "id": "cypress-d1207",
+              "expected": "Formal upright (Chokkan)",
+              "predicted": [
+                "Slanting (Shakan)",
+                "Literati (Bunjingi)",
+                "Forest (Yose-ue)"
+              ],
+              "top_matches": [
+                {
+                  "id": "juniper-pescia-shakan",
+                  "label": "Slanting (Shakan)",
+                  "score": 0.746084
+                },
+                {
+                  "id": "thuja-slanting",
+                  "label": "Slanting (Shakan)",
+                  "score": 0.677304
+                },
+                {
+                  "id": "cypress-bald-national-museum",
+                  "label": "Forest (Yose-ue)",
+                  "score": 0.676889
+                }
+              ]
+            },
+            {
+              "id": "juniper-california-220",
+              "expected": "Literati (Bunjingi)",
+              "predicted": [
+                "Slanting (Shakan)",
+                "Informal upright (Moyogi)",
+                "Formal upright (Chokkan)"
+              ],
+              "top_matches": [
+                {
+                  "id": "juniper-pescia-shakan",
+                  "label": "Slanting (Shakan)",
+                  "score": 0.829898
+                },
+                {
+                  "id": "juniper-dwarf-museum",
+                  "label": "Informal upright (Moyogi)",
+                  "score": 0.829137
+                },
+                {
+                  "id": "juniper-foemina-oct-2008",
+                  "label": "Formal upright (Chokkan)",
+                  "score": 0.813361
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "identity": {
+        "available": false,
+        "reason": "Each reviewed reference entry is a single-photo tree, so no unseen-photo identity benchmark can be built from this catalog yet."
+      }
+    }
+  }
+}

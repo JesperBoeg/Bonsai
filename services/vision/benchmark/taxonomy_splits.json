@@ -1,0 +1,629 @@
+{
+  "seed": 20260519,
+  "catalog_count": 55,
+  "notes": [
+    "Splits are task-specific and tree-disjoint.",
+    "A class needs at least 3 trees to support train/validation/test with at least one example per split.",
+    "Current identity benchmark is unavailable because the reviewed reference catalog contains one photo per tree."
+  ],
+  "species": {
+    "eligible_label_count": 5,
+    "excluded_label_count": 35,
+    "eligible_labels": [
+      {
+        "label": "Buddhist pine",
+        "count": 3,
+        "train_ids": [
+          "podocarpus-5zz"
+        ],
+        "validation_ids": [
+          "podocarpus-macrophyllus-generic"
+        ],
+        "test_ids": [
+          "podocarpus-pescia-moyogi-01"
+        ]
+      },
+      {
+        "label": "Chinese elm",
+        "count": 3,
+        "train_ids": [
+          "elm-ulmus-bbg"
+        ],
+        "validation_ids": [
+          "elm-chinese-111"
+        ],
+        "test_ids": [
+          "elm-lacebark-clump-raft"
+        ]
+      },
+      {
+        "label": "Foemina juniper",
+        "count": 3,
+        "train_ids": [
+          "juniper-foemina-stierch-a"
+        ],
+        "validation_ids": [
+          "juniper-foemina-oct-2008"
+        ],
+        "test_ids": [
+          "juniper-foemina-dec-2008"
+        ]
+      },
+      {
+        "label": "Japanese maple",
+        "count": 3,
+        "train_ids": [
+          "maple-fan-informal"
+        ],
+        "validation_ids": [
+          "maple-japanese-40"
+        ],
+        "test_ids": [
+          "maple-japanese-2011"
+        ]
+      },
+      {
+        "label": "Trident maple",
+        "count": 3,
+        "train_ids": [
+          "maple-trident-plain"
+        ],
+        "validation_ids": [
+          "maple-trident-203-a"
+        ],
+        "test_ids": [
+          "maple-trident-52"
+        ]
+      }
+    ],
+    "excluded_labels": [
+      {
+        "label": "American beech",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "beech-american-272"
+        ]
+      },
+      {
+        "label": "Arborvitae",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "thuja-slanting"
+        ]
+      },
+      {
+        "label": "Bald cypress",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "cypress-bald-national-museum"
+        ]
+      },
+      {
+        "label": "Black Hills spruce",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "spruce-black-hills-forest"
+        ]
+      },
+      {
+        "label": "Bougainvillea",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "bougainvillea-glabra-9zz"
+        ]
+      },
+      {
+        "label": "California juniper",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "juniper-california-220"
+        ]
+      },
+      {
+        "label": "Chinese juniper",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "juniper-pescia-shakan"
+        ]
+      },
+      {
+        "label": "Citrus",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "citrus-bbg-informal"
+        ]
+      },
+      {
+        "label": "Cotoneaster",
+        "count": 2,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "cotoneaster-cascade",
+          "cotoneaster-semi-cascade"
+        ]
+      },
+      {
+        "label": "Cypress",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "cypress-d1207"
+        ]
+      },
+      {
+        "label": "Dwarf Japanese juniper",
+        "count": 2,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "juniper-dwarf-museum",
+          "juniper-dwarf-deadwood-1975-2007"
+        ]
+      },
+      {
+        "label": "Dwarf jade",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "portulacaria-afra-2"
+        ]
+      },
+      {
+        "label": "English hawthorn",
+        "count": 2,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "hawthorn-crataegus-2023",
+          "hawthorn-english-1953-2007"
+        ]
+      },
+      {
+        "label": "European beech",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "beech-fagus-sylvatica-vladka"
+        ]
+      },
+      {
+        "label": "Ezo spruce",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "spruce-ezo-museum"
+        ]
+      },
+      {
+        "label": "Ficus",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "ficus-formal-upright"
+        ]
+      },
+      {
+        "label": "Hawthorn",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "hawthorn-pescia-moyogi"
+        ]
+      },
+      {
+        "label": "Hinoki cypress",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "cypress-obtusa-literati"
+        ]
+      },
+      {
+        "label": "Japanese beech",
+        "count": 2,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "beech-japanese-105",
+          "beech-fagus-crenata-2023"
+        ]
+      },
+      {
+        "label": "Japanese black pine",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "pine-black-135-literati"
+        ]
+      },
+      {
+        "label": "Japanese cypress",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "cypress-japan-bartusek"
+        ]
+      },
+      {
+        "label": "Japanese garden juniper",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "juniper-garden-juniper"
+        ]
+      },
+      {
+        "label": "Japanese wisteria",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "japanese-wisteria-1925-2007"
+        ]
+      },
+      {
+        "label": "Japanese zelkova",
+        "count": 2,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "elm-zelkova-16",
+          "hokidachi-photo"
+        ]
+      },
+      {
+        "label": "Kishu juniper",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "juniper-kishu-ishizuki"
+        ]
+      },
+      {
+        "label": "Korean beech",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "beech-korean"
+        ]
+      },
+      {
+        "label": "Lilac",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "lilac-bonzai-5925385130"
+        ]
+      },
+      {
+        "label": "Mistletoe fig",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "ficus-deltoidea-literati"
+        ]
+      },
+      {
+        "label": "Natal plum",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "carissa-cascade"
+        ]
+      },
+      {
+        "label": "Norway spruce",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "spruce-picea-abies-2023"
+        ]
+      },
+      {
+        "label": "Pine",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "pine-pescia-chokkan"
+        ]
+      },
+      {
+        "label": "Pomegranate",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "punica-slanting"
+        ]
+      },
+      {
+        "label": "Psidium",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "psidium-informal"
+        ]
+      },
+      {
+        "label": "Sawara cypress",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "cypress-pisifera-boulevard"
+        ]
+      },
+      {
+        "label": "Spruce",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "spruce-filoli"
+        ]
+      }
+    ],
+    "train_ids": [
+      "elm-ulmus-bbg",
+      "juniper-foemina-stierch-a",
+      "maple-fan-informal",
+      "maple-trident-plain",
+      "podocarpus-5zz"
+    ],
+    "validation_ids": [
+      "elm-chinese-111",
+      "juniper-foemina-oct-2008",
+      "maple-japanese-40",
+      "maple-trident-203-a",
+      "podocarpus-macrophyllus-generic"
+    ],
+    "test_ids": [
+      "elm-lacebark-clump-raft",
+      "juniper-foemina-dec-2008",
+      "maple-japanese-2011",
+      "maple-trident-52",
+      "podocarpus-pescia-moyogi-01"
+    ]
+  },
+  "style": {
+    "eligible_label_count": 6,
+    "excluded_label_count": 9,
+    "eligible_labels": [
+      {
+        "label": "Broom (Hokidachi)",
+        "count": 6,
+        "train_ids": [
+          "elm-ulmus-bbg",
+          "elm-zelkova-16",
+          "hokidachi-photo",
+          "beech-japanese-105"
+        ],
+        "validation_ids": [
+          "maple-trident-52"
+        ],
+        "test_ids": [
+          "maple-japanese-2011"
+        ]
+      },
+      {
+        "label": "Forest (Yose-ue)",
+        "count": 4,
+        "train_ids": [
+          "juniper-foemina-stierch-a",
+          "cypress-bald-national-museum"
+        ],
+        "validation_ids": [
+          "maple-trident-203-a"
+        ],
+        "test_ids": [
+          "spruce-black-hills-forest"
+        ]
+      },
+      {
+        "label": "Formal upright (Chokkan)",
+        "count": 7,
+        "train_ids": [
+          "pine-pescia-chokkan",
+          "cypress-japan-bartusek",
+          "juniper-foemina-oct-2008",
+          "ficus-formal-upright",
+          "podocarpus-5zz"
+        ],
+        "validation_ids": [
+          "juniper-foemina-dec-2008"
+        ],
+        "test_ids": [
+          "cypress-d1207"
+        ]
+      },
+      {
+        "label": "Informal upright (Moyogi)",
+        "count": 17,
+        "train_ids": [
+          "elm-chinese-111",
+          "juniper-dwarf-museum",
+          "maple-fan-informal",
+          "psidium-informal",
+          "beech-fagus-sylvatica-vladka",
+          "beech-american-272",
+          "podocarpus-macrophyllus-generic",
+          "beech-korean",
+          "japanese-wisteria-1925-2007",
+          "bougainvillea-glabra-9zz",
+          "spruce-ezo-museum"
+        ],
+        "validation_ids": [
+          "beech-fagus-crenata-2023",
+          "hawthorn-english-1953-2007",
+          "podocarpus-pescia-moyogi-01"
+        ],
+        "test_ids": [
+          "citrus-bbg-informal",
+          "hawthorn-pescia-moyogi",
+          "lilac-bonzai-5925385130"
+        ]
+      },
+      {
+        "label": "Literati (Bunjingi)",
+        "count": 5,
+        "train_ids": [
+          "cypress-obtusa-literati",
+          "cypress-pisifera-boulevard",
+          "pine-black-135-literati"
+        ],
+        "validation_ids": [
+          "ficus-deltoidea-literati"
+        ],
+        "test_ids": [
+          "juniper-california-220"
+        ]
+      },
+      {
+        "label": "Slanting (Shakan)",
+        "count": 6,
+        "train_ids": [
+          "punica-slanting",
+          "hawthorn-crataegus-2023",
+          "thuja-slanting",
+          "juniper-pescia-shakan"
+        ],
+        "validation_ids": [
+          "juniper-garden-juniper"
+        ],
+        "test_ids": [
+          "spruce-filoli"
+        ]
+      }
+    ],
+    "excluded_labels": [
+      {
+        "label": "Cascade (Kengai)",
+        "count": 2,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "cotoneaster-cascade",
+          "carissa-cascade"
+        ]
+      },
+      {
+        "label": "Double trunk (Sokan)",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "portulacaria-afra-2"
+        ]
+      },
+      {
+        "label": "Growing in rock (Ishisuki)",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "juniper-kishu-ishizuki"
+        ]
+      },
+      {
+        "label": "Growing on rock (Seki-joju)",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "maple-trident-plain"
+        ]
+      },
+      {
+        "label": "Multi-trunk (Kabudachi)",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "maple-japanese-40"
+        ]
+      },
+      {
+        "label": "Raft (Ikadabuki)",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "elm-lacebark-clump-raft"
+        ]
+      },
+      {
+        "label": "Semi-cascade (Han-kengai)",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "cotoneaster-semi-cascade"
+        ]
+      },
+      {
+        "label": "Shari deadwood (Sharimiki)",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "juniper-dwarf-deadwood-1975-2007"
+        ]
+      },
+      {
+        "label": "Windswept (Fukinagashi)",
+        "count": 1,
+        "reason": "requires at least 3 trees for train/validation/test",
+        "entry_ids": [
+          "spruce-picea-abies-2023"
+        ]
+      }
+    ],
+    "train_ids": [
+      "beech-american-272",
+      "beech-fagus-sylvatica-vladka",
+      "beech-japanese-105",
+      "beech-korean",
+      "bougainvillea-glabra-9zz",
+      "cypress-bald-national-museum",
+      "cypress-japan-bartusek",
+      "cypress-obtusa-literati",
+      "cypress-pisifera-boulevard",
+      "elm-chinese-111",
+      "elm-ulmus-bbg",
+      "elm-zelkova-16",
+      "ficus-formal-upright",
+      "hawthorn-crataegus-2023",
+      "hokidachi-photo",
+      "japanese-wisteria-1925-2007",
+      "juniper-dwarf-museum",
+      "juniper-foemina-oct-2008",
+      "juniper-foemina-stierch-a",
+      "juniper-pescia-shakan",
+      "maple-fan-informal",
+      "pine-black-135-literati",
+      "pine-pescia-chokkan",
+      "podocarpus-5zz",
+      "podocarpus-macrophyllus-generic",
+      "psidium-informal",
+      "punica-slanting",
+      "spruce-ezo-museum",
+      "thuja-slanting"
+    ],
+    "validation_ids": [
+      "beech-fagus-crenata-2023",
+      "ficus-deltoidea-literati",
+      "hawthorn-english-1953-2007",
+      "juniper-foemina-dec-2008",
+      "juniper-garden-juniper",
+      "maple-trident-203-a",
+      "maple-trident-52",
+      "podocarpus-pescia-moyogi-01"
+    ],
+    "test_ids": [
+      "citrus-bbg-informal",
+      "cypress-d1207",
+      "hawthorn-pescia-moyogi",
+      "juniper-california-220",
+      "lilac-bonzai-5925385130",
+      "maple-japanese-2011",
+      "spruce-black-hills-forest",
+      "spruce-filoli"
+    ]
+  },
+  "identity": {
+    "available": false,
+    "reason": "Each reviewed reference entry is a single-photo tree, so no unseen-photo identity benchmark can be built from this catalog yet."
+  }
+}

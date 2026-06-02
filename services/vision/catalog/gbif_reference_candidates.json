@@ -1,0 +1,344 @@
+{
+  "notes": [
+    "This is an offline ingestion manifest. It is not loaded by the runtime app.",
+    "GBIF is a secondary backfill source. Use it only when iNaturalist coverage is weak.",
+    "GBIF media licenses are filtered aggressively because many image-bearing occurrences are not permissive by default."
+  ],
+  "sourceName": "gbif",
+  "sourcePriority": 2,
+  "sourceRanking": [
+    {
+      "source": "inaturalist",
+      "priority": 1,
+      "role": "primary",
+      "notes": "Primary open-license ingestion source for the cached leaf index."
+    },
+    {
+      "source": "gbif",
+      "priority": 2,
+      "role": "secondary-backfill",
+      "notes": "Secondary backfill source used only when iNaturalist coverage is weak and media licenses are permissive."
+    }
+  ],
+  "allowedLicenseCodes": [
+    "cc0",
+    "cc-by",
+    "cc-by-sa"
+  ],
+  "entries": [
+    {
+      "slug": "juniperus-procumbens",
+      "label": "Japanese garden juniper",
+      "subtitle": "Juniperus procumbens",
+      "taxonRank": "species",
+      "catalogTier": "core",
+      "recognitionEnabled": true,
+      "careProfileSlug": "juniperus-procumbens",
+      "sourceName": "gbif",
+      "sourcePriority": 2,
+      "resolvedTaxon": {
+        "usageKey": 2684586,
+        "scientificName": "Juniperus procumbens (Siebold ex Endl.) Miq.",
+        "canonicalName": "Juniperus procumbens",
+        "rank": "SPECIES",
+        "status": "ACCEPTED",
+        "matchType": "EXACT",
+        "matchedQuery": "Juniperus procumbens"
+      },
+      "candidatePhotos": [
+        {
+          "sourceName": "gbif",
+          "sourcePriority": 2,
+          "occurrenceId": "1849172955",
+          "occurrenceUrl": "https://www.gbif.org/occurrence/1849172955",
+          "mediaId": "https://media01.symbiota.org/media/seinet/sernec/USCH/USCH0084/USCH0084629_a.JPG",
+          "imageUrl": "https://media01.symbiota.org/media/seinet/sernec/USCH/USCH0084/USCH0084629_a.JPG",
+          "licenseCode": "cc0",
+          "attribution": "University of South Carolina, A. C. Moore Herbarium Vascular Plant Collection",
+          "observedOn": "2014-04-08",
+          "placeGuess": "Belton, South Carolina, US"
+        },
+        {
+          "sourceName": "gbif",
+          "sourcePriority": 2,
+          "occurrenceId": "1849172955",
+          "occurrenceUrl": "https://www.gbif.org/occurrence/1849172955",
+          "mediaId": "https://media01.symbiota.org/media/seinet/sernec/USCH/USCH0084/USCH0084629.JPG",
+          "imageUrl": "https://media01.symbiota.org/media/seinet/sernec/USCH/USCH0084/USCH0084629.JPG",
+          "licenseCode": "cc0",
+          "attribution": "University of South Carolina, A. C. Moore Herbarium Vascular Plant Collection",
+          "observedOn": "2014-04-08",
+          "placeGuess": "Belton, South Carolina, US"
+        },
+        {
+          "sourceName": "gbif",
+          "sourcePriority": 2,
+          "occurrenceId": "2866734511",
+          "occurrenceUrl": "https://www.gbif.org/occurrence/2866734511",
+          "mediaId": "https://media01.symbiota.org/media/seinet/sernec/USCH/USCH0084/USCH0084740.JPG",
+          "imageUrl": "https://media01.symbiota.org/media/seinet/sernec/USCH/USCH0084/USCH0084740.JPG",
+          "licenseCode": "cc0",
+          "attribution": "University of South Carolina, A. C. Moore Herbarium Vascular Plant Collection",
+          "observedOn": "1981-03-26",
+          "placeGuess": "Southwestern Louisiana University, Lafayette, Louisiana, US"
+        },
+        {
+          "sourceName": "gbif",
+          "sourcePriority": 2,
+          "occurrenceId": "1831329660",
+          "occurrenceUrl": "https://www.gbif.org/occurrence/1831329660",
+          "mediaId": "https://iiif.rbge.org.uk/herb/iiif/E00893702/full/300,/0/default.jpg",
+          "imageUrl": "https://iiif.rbge.org.uk/herb/iiif/E00893702/full/300,/0/default.jpg",
+          "licenseCode": "cc0",
+          "attribution": null,
+          "observedOn": null,
+          "placeGuess": null
+        },
+        {
+          "sourceName": "gbif",
+          "sourcePriority": 2,
+          "occurrenceId": "1831329810",
+          "occurrenceUrl": "https://www.gbif.org/occurrence/1831329810",
+          "mediaId": "https://iiif.rbge.org.uk/herb/iiif/E00893700/full/300,/0/default.jpg",
+          "imageUrl": "https://iiif.rbge.org.uk/herb/iiif/E00893700/full/300,/0/default.jpg",
+          "licenseCode": "cc0",
+          "attribution": null,
+          "observedOn": null,
+          "placeGuess": null
+        },
+        {
+          "sourceName": "gbif",
+          "sourcePriority": 2,
+          "occurrenceId": "1831330012",
+          "occurrenceUrl": "https://www.gbif.org/occurrence/1831330012",
+          "mediaId": "https://iiif.rbge.org.uk/herb/iiif/E00893701/full/300,/0/default.jpg",
+          "imageUrl": "https://iiif.rbge.org.uk/herb/iiif/E00893701/full/300,/0/default.jpg",
+          "licenseCode": "cc0",
+          "attribution": null,
+          "observedOn": null,
+          "placeGuess": null
+        }
+      ]
+    },
+    {
+      "slug": "ficus-retusa",
+      "label": "Banyan fig",
+      "subtitle": "Ficus retusa",
+      "taxonRank": "species",
+      "catalogTier": "core",
+      "recognitionEnabled": true,
+      "careProfileSlug": "ficus-retusa",
+      "sourceName": "gbif",
+      "sourcePriority": 2,
+      "resolvedTaxon": {
+        "usageKey": 3765871,
+        "scientificName": "Ficus retusa L.",
+        "canonicalName": "Ficus retusa",
+        "rank": "SPECIES",
+        "status": "ACCEPTED",
+        "matchType": "EXACT",
+        "matchedQuery": "Ficus retusa"
+      },
+      "candidatePhotos": [
+        {
+          "sourceName": "gbif",
+          "sourcePriority": 2,
+          "occurrenceId": "1449776661",
+          "occurrenceUrl": "https://www.gbif.org/occurrence/1449776661",
+          "mediaId": "http://jbrj-public-img.s3-sa-east-1.amazonaws.com/JPG/rb/1/29/3/87/01290387.jpg",
+          "imageUrl": "http://jbrj-public-img.s3-sa-east-1.amazonaws.com/JPG/rb/1/29/3/87/01290387.jpg",
+          "licenseCode": "cc-by",
+          "attribution": "Rio de Janeiro Botanical Garden",
+          "observedOn": "1984-09-12",
+          "placeGuess": "M\u00e9xico, Acapulco, Guerrero, pra\u00e7a pr\u00f3ximo ao Centro de Conven\u00e7\u00f5es., BR"
+        },
+        {
+          "sourceName": "gbif",
+          "sourcePriority": 2,
+          "occurrenceId": "2270522786",
+          "occurrenceUrl": "https://www.gbif.org/occurrence/2270522786",
+          "mediaId": "https://media01.symbiota.org/media/h_seinet/seinet/ASU/ASU0045/ASU0045154.jpg",
+          "imageUrl": "https://media01.symbiota.org/media/h_seinet/seinet/ASU/ASU0045/ASU0045154.jpg",
+          "licenseCode": "cc-by",
+          "attribution": "Arizona State University Vascular Plant Herbarium",
+          "observedOn": "1981-05-22",
+          "placeGuess": "Mpio. de Cd. Valles: Rancho Tinaja, 5.5 miles S of Cd. Valles, San Luis Potosi, MX"
+        },
+        {
+          "sourceName": "gbif",
+          "sourcePriority": 2,
+          "occurrenceId": "2270522786",
+          "occurrenceUrl": "https://www.gbif.org/occurrence/2270522786",
+          "mediaId": "https://media01.symbiota.org/media/h_seinet/seinet/ASU/ASU0045/ASU0045154a_lg.jpg",
+          "imageUrl": "https://media01.symbiota.org/media/h_seinet/seinet/ASU/ASU0045/ASU0045154a_lg.jpg",
+          "licenseCode": "cc-by",
+          "attribution": "Arizona State University Vascular Plant Herbarium",
+          "observedOn": "1981-05-22",
+          "placeGuess": "Mpio. de Cd. Valles: Rancho Tinaja, 5.5 miles S of Cd. Valles, San Luis Potosi, MX"
+        }
+      ]
+    },
+    {
+      "slug": "pinus-parviflora",
+      "label": "Japanese white pine",
+      "subtitle": "Pinus parviflora",
+      "taxonRank": "species",
+      "catalogTier": "core",
+      "recognitionEnabled": true,
+      "careProfileSlug": "pinus-parviflora",
+      "sourceName": "gbif",
+      "sourcePriority": 2,
+      "resolvedTaxon": {
+        "usageKey": 5285589,
+        "scientificName": "Pinus parviflora Siebold & Zucc.",
+        "canonicalName": "Pinus parviflora",
+        "rank": "SPECIES",
+        "status": "ACCEPTED",
+        "matchType": "EXACT",
+        "matchedQuery": "Pinus parviflora"
+      },
+      "candidatePhotos": [
+        {
+          "sourceName": "gbif",
+          "sourcePriority": 2,
+          "occurrenceId": "1898753805",
+          "occurrenceUrl": "https://www.gbif.org/occurrence/1898753805",
+          "mediaId": "https://iiif.rbge.org.uk/herb/iiif/E00895717/full/300,/0/default.jpg",
+          "imageUrl": "https://iiif.rbge.org.uk/herb/iiif/E00895717/full/300,/0/default.jpg",
+          "licenseCode": "cc0",
+          "attribution": null,
+          "observedOn": "2013-10-03",
+          "placeGuess": "Japan:Nagano:Ina city.  Katokochi national forest., Nagano, JP"
+        },
+        {
+          "sourceName": "gbif",
+          "sourcePriority": 2,
+          "occurrenceId": "3344426977",
+          "occurrenceUrl": "https://www.gbif.org/occurrence/3344426977",
+          "mediaId": "https://media01.symbiota.org/media/seinet/sernec/CLEMS/CLEMS0002/CLEMS0002693.jpg",
+          "imageUrl": "https://media01.symbiota.org/media/seinet/sernec/CLEMS/CLEMS0002/CLEMS0002693.jpg",
+          "licenseCode": "cc-by",
+          "attribution": "Clemson University Herbarium",
+          "observedOn": "2010-02-19",
+          "placeGuess": "SCBG -- South Carolina Botanical Garden, Clemson University, Clemson. Area between the Hayden Conference Center and Garden Trail Rd., South Carolina, US"
+        },
+        {
+          "sourceName": "gbif",
+          "sourcePriority": 2,
+          "occurrenceId": "2573216786",
+          "occurrenceUrl": "https://www.gbif.org/occurrence/2573216786",
+          "mediaId": "http://herb.csbg.nsc.ru:8081/backend/herbarium/view/36359",
+          "imageUrl": "http://herb.csbg.nsc.ru:8081/backend/herbarium/view/36359",
+          "licenseCode": "cc-by",
+          "attribution": null,
+          "observedOn": "1993-10-14",
+          "placeGuess": "Nara, JP"
+        },
+        {
+          "sourceName": "gbif",
+          "sourcePriority": 2,
+          "occurrenceId": "3344426973",
+          "occurrenceUrl": "https://www.gbif.org/occurrence/3344426973",
+          "mediaId": "https://media01.symbiota.org/media/seinet/sernec/CLEMS/CLEMS0002/CLEMS0002692.jpg",
+          "imageUrl": "https://media01.symbiota.org/media/seinet/sernec/CLEMS/CLEMS0002/CLEMS0002692.jpg",
+          "licenseCode": "cc-by",
+          "attribution": "Clemson University Herbarium",
+          "observedOn": "1983-10-19",
+          "placeGuess": "SCBG -- South Carolina Botanical Garden, Clemson University, Clemson. (Clemson University Horticultural Gardens.) Located ca. 0.5 miles west of jct of Co. Rd. 320 (Perimeter Rd., Clemson University) and US 76. On South side of Perimeter Rd. Ca. 1.5 miles due SE of town of Clemson. SC. Forestry plantings, south of Hort. gardens., South Carolina, US"
+        }
+      ]
+    },
+    {
+      "slug": "malus-halliana",
+      "label": "Hall crabapple",
+      "subtitle": "Malus halliana",
+      "taxonRank": "species",
+      "catalogTier": "core",
+      "recognitionEnabled": true,
+      "careProfileSlug": "malus-halliana",
+      "sourceName": "gbif",
+      "sourcePriority": 2,
+      "resolvedTaxon": {
+        "usageKey": 3001220,
+        "scientificName": "Malus halliana Koehne",
+        "canonicalName": "Malus halliana",
+        "rank": "SPECIES",
+        "status": "ACCEPTED",
+        "matchType": "EXACT",
+        "matchedQuery": "Malus halliana"
+      },
+      "candidatePhotos": [
+        {
+          "sourceName": "gbif",
+          "sourcePriority": 2,
+          "occurrenceId": "2430684071",
+          "occurrenceUrl": "https://www.gbif.org/occurrence/2430684071",
+          "mediaId": "https://media01.symbiota.org/media/seinet/sernec/USCH/USCH0055/USCH0055145.JPG",
+          "imageUrl": "https://media01.symbiota.org/media/seinet/sernec/USCH/USCH0055/USCH0055145.JPG",
+          "licenseCode": "cc0",
+          "attribution": "University of South Carolina, A. C. Moore Herbarium Vascular Plant Collection",
+          "observedOn": "2001-03-04",
+          "placeGuess": "Columbia, South Carolina, US"
+        },
+        {
+          "sourceName": "gbif",
+          "sourcePriority": 2,
+          "occurrenceId": "2430682638",
+          "occurrenceUrl": "https://www.gbif.org/occurrence/2430682638",
+          "mediaId": "https://media01.symbiota.org/media/seinet/sernec/USCH/USCH0055/USCH0055146.JPG",
+          "imageUrl": "https://media01.symbiota.org/media/seinet/sernec/USCH/USCH0055/USCH0055146.JPG",
+          "licenseCode": "cc0",
+          "attribution": "University of South Carolina, A. C. Moore Herbarium Vascular Plant Collection",
+          "observedOn": "1984-04-10",
+          "placeGuess": "Elgin, South Carolina, US"
+        },
+        {
+          "sourceName": "gbif",
+          "sourcePriority": 2,
+          "occurrenceId": "1849097387",
+          "occurrenceUrl": "https://www.gbif.org/occurrence/1849097387",
+          "mediaId": "https://media01.symbiota.org/media/seinet/sernec/USCH/USCH0055/USCH0055221.JPG",
+          "imageUrl": "https://media01.symbiota.org/media/seinet/sernec/USCH/USCH0055/USCH0055221.JPG",
+          "licenseCode": "cc0",
+          "attribution": "University of South Carolina, A. C. Moore Herbarium Vascular Plant Collection",
+          "observedOn": "1984-05-08",
+          "placeGuess": "Winterthur, Delaware, US"
+        }
+      ]
+    },
+    {
+      "slug": "carpinus-turczaninowii",
+      "label": "Korean hornbeam",
+      "subtitle": "Carpinus turczaninowii",
+      "taxonRank": "species",
+      "catalogTier": "core",
+      "recognitionEnabled": true,
+      "careProfileSlug": "carpinus-turczaninowii",
+      "sourceName": "gbif",
+      "sourcePriority": 2,
+      "resolvedTaxon": {
+        "usageKey": 2875945,
+        "scientificName": "Carpinus turczaninowii Hance",
+        "canonicalName": "Carpinus turczaninowii",
+        "rank": "SPECIES",
+        "status": "ACCEPTED",
+        "matchType": "EXACT",
+        "matchedQuery": "Carpinus turczaninowii"
+      },
+      "candidatePhotos": [
+        {
+          "sourceName": "gbif",
+          "sourcePriority": 2,
+          "occurrenceId": "574931565",
+          "occurrenceUrl": "https://www.gbif.org/occurrence/574931565",
+          "mediaId": "https://iiif.rbge.org.uk/herb/iiif/E00275514/full/300,/0/default.jpg",
+          "imageUrl": "https://iiif.rbge.org.uk/herb/iiif/E00275514/full/300,/0/default.jpg",
+          "licenseCode": "cc0",
+          "attribution": null,
+          "observedOn": "1906-09",
+          "placeGuess": "South Korea:Inch'on-gwangyoksi:Chemulpo, in horto residentis germanici., Incheon, KR"
+        }
+      ]
+    }
+  ]
+}

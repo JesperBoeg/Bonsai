@@ -1,0 +1,17 @@
+{
+  "catalog_count": 55,
+  "notes": [
+    "This evaluation scores each reviewed catalog image against the full reviewed catalog, so the query image is present in the reference pool.",
+    "This is a product-acceptance coverage check for the current 55-image suggestion set, not a replacement for honest holdout evaluation."
+  ],
+  "species": {
+    "top3_hits": 55,
+    "top3_accuracy": 1.0,
+    "failures": []
+  },
+  "style": {
+    "top3_hits": 55,
+    "top3_accuracy": 1.0,
+    "failures": []
+  }
+}

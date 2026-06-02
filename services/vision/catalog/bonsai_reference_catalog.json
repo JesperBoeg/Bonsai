@@ -1,0 +1,497 @@
+[
+  {
+    "id": "juniper-foemina-oct-2008",
+    "local_path": "captured/juniper-foemina-oct-2008.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Foemina_Juniper_bonsai_224,_October_10,_2008.jpg",
+    "species_label": "Foemina juniper",
+    "style_label": "Formal upright (Chokkan)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "juniper-foemina-dec-2008",
+    "local_path": "captured/juniper-foemina-dec-2008.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Foemina_Juniper_bonsai_224,_December_24,_2008.jpg",
+    "species_label": "Foemina juniper",
+    "style_label": "Formal upright (Chokkan)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "juniper-pescia-shakan",
+    "local_path": "captured/juniper-pescia-shakan.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Pescia,_museo_del_bonsai,_juniperus_chinensis,_stile_shakan_(inclinato),_dalla_cina,_circa_50_anni.jpg",
+    "species_label": "Chinese juniper",
+    "style_label": "Slanting (Shakan)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "juniper-garden-juniper",
+    "local_path": "captured/juniper-garden-juniper.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Bonzai_Japanese_Garden_Juniper_(3889932708).jpg",
+    "species_label": "Japanese garden juniper",
+    "style_label": "Slanting (Shakan)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "juniper-dwarf-museum",
+    "local_path": "captured/juniper-dwarf-museum.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Dwarf_Japanese_Juniper_-_National_Bonsai_%26_Penjing_Museum_-_Washington,_D.C._-_Sarah_Stierch.jpg",
+    "species_label": "Dwarf Japanese juniper",
+    "style_label": "Informal upright (Moyogi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "maple-trident-plain",
+    "local_path": "captured/maple-trident-plain.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:BonsaiTridentMaple.jpg",
+    "species_label": "Trident maple",
+    "style_label": "Growing on rock (Seki-joju)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "maple-japanese-2011",
+    "local_path": "captured/maple-japanese-2011.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Japanese_Maple_bonsai,_2011-05-29.jpg",
+    "species_label": "Japanese maple",
+    "style_label": "Broom (Hokidachi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "maple-japanese-40",
+    "local_path": "captured/maple-japanese-40.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Japanese_Maple_bonsai_40,_December_24,_2008.jpg",
+    "species_label": "Japanese maple",
+    "style_label": "Multi-trunk (Kabudachi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "maple-trident-52",
+    "local_path": "captured/maple-trident-52.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Trident_Maple_bonsai_52,_October_10,_2008.jpg",
+    "species_label": "Trident maple",
+    "style_label": "Broom (Hokidachi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "maple-fan-informal",
+    "local_path": "captured/maple-fan-informal.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Japanischer_F%C3%A4cherahorn_Bonsai_ca._25_Jahre.png",
+    "species_label": "Japanese maple",
+    "style_label": "Informal upright (Moyogi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "elm-chinese-111",
+    "local_path": "captured/elm-chinese-111.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Chinese_Elm_bonsai_111,_December_24,_2008.jpg",
+    "species_label": "Chinese elm",
+    "style_label": "Informal upright (Moyogi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "elm-ulmus-bbg",
+    "local_path": "captured/elm-ulmus-bbg.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Ulmus_parvifolia_bonsai_at_the_BBG,_August_2,_2008.jpg",
+    "species_label": "Chinese elm",
+    "style_label": "Broom (Hokidachi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "elm-zelkova-16",
+    "local_path": "captured/elm-zelkova-16.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Japanese_Zelkova_bonsai_16,_October_10,_2008.jpg",
+    "species_label": "Japanese zelkova",
+    "style_label": "Broom (Hokidachi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "beech-korean",
+    "local_path": "captured/beech-korean.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Korean_Beech_Bonsai_Tree.jpg",
+    "species_label": "Korean beech",
+    "style_label": "Informal upright (Moyogi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "beech-american-272",
+    "local_path": "captured/beech-american-272.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:American_Beech_bonsai_272,_October_10,_2008.jpg",
+    "species_label": "American beech",
+    "style_label": "Informal upright (Moyogi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "beech-japanese-105",
+    "local_path": "captured/beech-japanese-105.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Japanese_Beech_2015-06_105.jpg",
+    "species_label": "Japanese beech",
+    "style_label": "Broom (Hokidachi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "beech-fagus-crenata-2023",
+    "local_path": "captured/beech-fagus-crenata-2023.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:2023_Bonsai_Fagus_Crenata_Josef_Panik.jpg",
+    "species_label": "Japanese beech",
+    "style_label": "Informal upright (Moyogi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "beech-fagus-sylvatica-vladka",
+    "local_path": "captured/beech-fagus-sylvatica-vladka.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:2023_Bonsai_Fagus_Sylvatica_Vladka_Komurkova.jpg",
+    "species_label": "European beech",
+    "style_label": "Informal upright (Moyogi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "cypress-japan-bartusek",
+    "local_path": "captured/cypress-japan-bartusek.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:8._Jap%C3%A1n_ciprus_-_bonsai,_Bartusek_L%C3%A1szl%C3%B3.JPG",
+    "species_label": "Japanese cypress",
+    "style_label": "Formal upright (Chokkan)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "cypress-d1207",
+    "local_path": "captured/cypress-d1207.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Cypress_bonsai_D1207.jpg",
+    "species_label": "Cypress",
+    "style_label": "Formal upright (Chokkan)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "cypress-bald-national-museum",
+    "local_path": "captured/cypress-bald-national-museum.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Bald_Cypress_-_National_Bonsai_%26_Penjing_Museum_-_Washington,_D.C._-_Sarah_Stierch.jpg",
+    "species_label": "Bald cypress",
+    "style_label": "Forest (Yose-ue)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "cypress-obtusa-literati",
+    "local_path": "captured/cypress-obtusa-literati.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Chamaecyparis_obtusa_bonsai,_Longwood_Gardens_2023.jpg",
+    "species_label": "Hinoki cypress",
+    "style_label": "Literati (Bunjingi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "cypress-pisifera-boulevard",
+    "local_path": "captured/cypress-pisifera-boulevard.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Chamaecyparis_pisifera_%27Boulevard%27_bonsai_-_Dawes_Arboretum_-_DSC02981.JPG",
+    "species_label": "Sawara cypress",
+    "style_label": "Literati (Bunjingi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "podocarpus-macrophyllus-generic",
+    "local_path": "captured/podocarpus-macrophyllus-generic.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Podocarpus_macrophyllus_bonsai.jpg",
+    "species_label": "Buddhist pine",
+    "style_label": "Informal upright (Moyogi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "podocarpus-pescia-moyogi-01",
+    "local_path": "captured/podocarpus-pescia-moyogi-01.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Pescia,_museo_del_bonsai,_podocarpus_macrophyllus,_stile_moyogi_(eretto_informale),_dalla_cina,_circa_70_anni_01.jpg",
+    "species_label": "Buddhist pine",
+    "style_label": "Informal upright (Moyogi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "podocarpus-5zz",
+    "local_path": "captured/podocarpus-5zz.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Podocarpus_macrophyllus_5zz.jpg",
+    "species_label": "Buddhist pine",
+    "style_label": "Formal upright (Chokkan)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "ficus-formal-upright",
+    "local_path": "captured/ficus-formal-upright.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Formal_Upright_Ficus_Bonsai.jpg",
+    "species_label": "Ficus",
+    "style_label": "Formal upright (Chokkan)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "pine-pescia-chokkan",
+    "local_path": "captured/pine-pescia-chokkan.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Pescia,_museo_del_bonsai,_pinus_halepensisa,_stile_chokkan_(eretto_formale),_da_italia,_circa_60_anni.jpg",
+    "species_label": "Pine",
+    "style_label": "Formal upright (Chokkan)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "citrus-bbg-informal",
+    "local_path": "captured/citrus-bbg-informal.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:BBG_-_Citrus_x_limonia_-_Informal_upright.jpg",
+    "species_label": "Citrus",
+    "style_label": "Informal upright (Moyogi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "hawthorn-pescia-moyogi",
+    "local_path": "captured/hawthorn-pescia-moyogi.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Pescia,_museo_del_bonsai,_Crataegus_sp._stile_moyogi_(eretto_informale),_con_frutti.jpg",
+    "species_label": "Hawthorn",
+    "style_label": "Informal upright (Moyogi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "psidium-informal",
+    "local_path": "captured/psidium-informal.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:BBG_-_Psidium_littorale_var._longipes_-_Informal_upright.jpg",
+    "species_label": "Psidium",
+    "style_label": "Informal upright (Moyogi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "ficus-deltoidea-literati",
+    "local_path": "captured/ficus-deltoidea-literati.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:BBG_-_Ficus_deltoidea_-_Literati.jpg",
+    "species_label": "Mistletoe fig",
+    "style_label": "Literati (Bunjingi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "pine-black-135-literati",
+    "local_path": "captured/pine-black-135-literati.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Japanese_Black_Pine_bonsai_135,_October_10,_2008.jpg",
+    "species_label": "Japanese black pine",
+    "style_label": "Literati (Bunjingi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "hokidachi-photo",
+    "local_path": "captured/hokidachi-photo.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Hokidachi.jpg",
+    "species_label": "Japanese zelkova",
+    "style_label": "Broom (Hokidachi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "punica-slanting",
+    "local_path": "captured/punica-slanting.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Punica_granatum_bonsai,_Longwood_Gardens_2022.jpg",
+    "species_label": "Pomegranate",
+    "style_label": "Slanting (Shakan)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "thuja-slanting",
+    "local_path": "captured/thuja-slanting.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Thuja_occidentalis_bonsai_2015-06_113.jpg",
+    "species_label": "Arborvitae",
+    "style_label": "Slanting (Shakan)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "cotoneaster-cascade",
+    "local_path": "captured/cotoneaster-cascade.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Cotoneaster_Cascade_Bonsai.jpg",
+    "species_label": "Cotoneaster",
+    "style_label": "Cascade (Kengai)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "cotoneaster-semi-cascade",
+    "local_path": "captured/cotoneaster-semi-cascade.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Semi-cascade_cotoneaster_bonsai.jpg",
+    "species_label": "Cotoneaster",
+    "style_label": "Semi-cascade (Han-kengai)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "carissa-cascade",
+    "local_path": "captured/carissa-cascade.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:BBG_-_Carissa_macrocarpa_var._Horizontalis_-_Cascade_by_Frank_Okamura.jpg",
+    "species_label": "Natal plum",
+    "style_label": "Cascade (Kengai)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "hawthorn-crataegus-2023",
+    "local_path": "captured/hawthorn-crataegus-2023.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:2023_Bonsai_Crataegus_Leavigata_Vladimir_Ondejcik.jpg",
+    "species_label": "English hawthorn",
+    "style_label": "Slanting (Shakan)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "hawthorn-english-1953-2007",
+    "local_path": "captured/hawthorn-english-1953-2007.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:English_Hawthorn,_1953-2007.jpg",
+    "species_label": "English hawthorn",
+    "style_label": "Informal upright (Moyogi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "spruce-ezo-museum",
+    "local_path": "captured/spruce-ezo-museum.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Ezo_Spruce_-_National_Bonsai_%26_Penjing_Museum_-_Washington,_D.C._-_Sarah_Stierch.jpg",
+    "species_label": "Ezo spruce",
+    "style_label": "Informal upright (Moyogi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "spruce-black-hills-forest",
+    "local_path": "captured/spruce-black-hills-forest.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Black_Hills_Spruce_bonsai_forest_planting,_July_13,_2008.jpg",
+    "species_label": "Black Hills spruce",
+    "style_label": "Forest (Yose-ue)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "spruce-filoli",
+    "local_path": "captured/spruce-filoli.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Filoli_Bonsai_spruce.jpg",
+    "species_label": "Spruce",
+    "style_label": "Slanting (Shakan)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "spruce-picea-abies-2023",
+    "local_path": "captured/spruce-picea-abies-2023.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:2023_Bonsai_Picea_Abies_Lukas_Prauss.jpg",
+    "species_label": "Norway spruce",
+    "style_label": "Windswept (Fukinagashi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "lilac-bonzai-5925385130",
+    "local_path": "captured/lilac-bonzai-5925385130.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Bonzai_Lilac_-_5925385130.jpg",
+    "species_label": "Lilac",
+    "style_label": "Informal upright (Moyogi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "juniper-california-220",
+    "local_path": "captured/juniper-california-220.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:California_Juniper_bonsai_220,_October_10,_2008.jpg",
+    "species_label": "California juniper",
+    "style_label": "Literati (Bunjingi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "juniper-foemina-stierch-a",
+    "local_path": "captured/juniper-foemina-stierch-a.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Foemina_Juniper_bonsai_-_National_Bonsai_%26_Penjing_Museum_-_Washington,_D.C._-_Sarah_Stierch_-_A.jpg",
+    "species_label": "Foemina juniper",
+    "style_label": "Forest (Yose-ue)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "portulacaria-afra-2",
+    "local_path": "captured/portulacaria-afra-2.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Portulacaria_afra_2.jpg",
+    "species_label": "Dwarf jade",
+    "style_label": "Double trunk (Sokan)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "japanese-wisteria-1925-2007",
+    "local_path": "captured/japanese-wisteria-1925-2007.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Japanese_Wisteria,_1925-2007.jpg",
+    "species_label": "Japanese wisteria",
+    "style_label": "Informal upright (Moyogi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "bougainvillea-glabra-9zz",
+    "local_path": "captured/bougainvillea-glabra-9zz.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Bougainvillea_glabra_9zz.jpg",
+    "species_label": "Bougainvillea",
+    "style_label": "Informal upright (Moyogi)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "juniper-kishu-ishizuki",
+    "local_path": "captured/juniper-kishu-ishizuki.jpg",
+    "source_page_url": "https://webonsai.com/product/ishizuki-composition-with-kishu-juniper/",
+    "species_label": "Kishu juniper",
+    "style_label": "Growing in rock (Ishisuki)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "elm-lacebark-clump-raft",
+    "local_path": "captured/elm-lacebark-clump-raft.jpg",
+    "source_page_url": "https://bryanlovesbonsai.com/products/lacebark-chinese-elm-bonsai-13-inch-plastic-pot-1?_pos=1&_sid=631e58faf&_ss=r",
+    "species_label": "Chinese elm",
+    "style_label": "Raft (Ikadabuki)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "juniper-dwarf-deadwood-1975-2007",
+    "local_path": "captured/juniper-dwarf-deadwood-1975-2007.jpg",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Dwarf_Japanese_Juniper,_1975-2007.jpg",
+    "species_label": "Dwarf Japanese juniper",
+    "style_label": "Shari deadwood (Sharimiki)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  },
+  {
+    "id": "maple-trident-203-a",
+    "local_path": "captured/maple-trident-203-a.png",
+    "source_page_url": "https://commons.wikimedia.org/wiki/File:Trident_Maple_bonsai_203,_May_29,_2011_a_-_Stierch.jpg",
+    "species_label": "Trident maple",
+    "style_label": "Forest (Yose-ue)",
+    "use_for_species_eval": true,
+    "use_for_style_eval": true
+  }
+]

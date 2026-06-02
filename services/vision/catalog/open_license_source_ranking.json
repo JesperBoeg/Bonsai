@@ -1,0 +1,14 @@
+[
+  {
+    "source": "inaturalist",
+    "priority": 1,
+    "role": "primary",
+    "notes": "Primary open-license ingestion source for the cached leaf index."
+  },
+  {
+    "source": "gbif",
+    "priority": 2,
+    "role": "secondary-backfill",
+    "notes": "Secondary backfill source used only when iNaturalist coverage is weak and media licenses are permissive."
+  }
+]

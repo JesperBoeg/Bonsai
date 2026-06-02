@@ -1,0 +1,17 @@
+{
+  "name": "bonsai",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace bonsai-web --",
+    "build:web": "npm run build --workspace bonsai-web",
+    "lint:web": "npm run lint --workspace bonsai-web",
+    "dev:vision": "py -m uvicorn app.main:app --reload --app-dir services/vision"
+  },
+  "devDependencies": {
+    "pg": "^8.21.0",
+    "supabase": "^2.104.0"
+  }
+}

@@ -1,0 +1,8 @@
+README.md
+pyproject.toml
+app/main.py
+bonsai_vision.egg-info/PKG-INFO
+bonsai_vision.egg-info/SOURCES.txt
+bonsai_vision.egg-info/dependency_links.txt
+bonsai_vision.egg-info/requires.txt
+bonsai_vision.egg-info/top_level.txt
