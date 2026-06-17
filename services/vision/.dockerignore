@@ -1,0 +1,6 @@
+.venv/
+benchmark/
+bonsai_vision.egg-info/
+**/__pycache__/
+*.pyc
+.hf-cache/
