@@ -1,9 +1,11 @@
 import type { Route } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { SubmitButton } from "../../../components/submit-button";
-import { updateTreePlanAction } from "../actions";
+import { StudioLab } from "../../../components/studio-lab";
+import { createTargetStateAction, updateTreePlanAction } from "../actions";
+import { getRequiredViewer } from "../../../lib/auth";
 import { formatDisplayDate, getTreeDetail } from "../../../lib/bonsai";
+import { getStudioData } from "../../../lib/studio";
 
 type TreePageProps = {
   params: Promise<{
@@ -11,6 +13,7 @@ type TreePageProps = {
   }>;
   searchParams?: Promise<{
     tab?: string | string[];
+    target?: string | string[];
   }>;
 };
 
@@ -18,10 +21,10 @@ export const dynamic = "force-dynamic";
 
 const TREE_DETAIL_TABS = [
   { id: "pictures", label: "Photos" },
+  { id: "studio", label: "Studio" },
   { id: "care", label: "Care" },
   { id: "characteristics", label: "Tree traits" },
   { id: "bonsai", label: "Bonsai notes" },
-  { id: "plan", label: "Plan" },
   { id: "seasonal", label: "Seasonal guide" },
 ] as const;
 
@@ -40,6 +43,7 @@ type TreeCareProfile = {
 export default async function TreePage({ params, searchParams }: TreePageProps) {
   const { treeId } = await params;
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const viewer = await getRequiredViewer(`/trees/${treeId}`);
   const tree = await getTreeDetail(undefined, undefined, treeId);
 
   if (!tree) {
@@ -48,11 +52,15 @@ export default async function TreePage({ params, searchParams }: TreePageProps) 
 
   const activeTab = readActiveTab(resolvedSearchParams?.tab);
   const activeTabLabel = TREE_DETAIL_TABS.find((tab) => tab.id === activeTab)?.label ?? "Photos";
+  const focusTargetId = readSingleValue(resolvedSearchParams?.target);
+  const studio = activeTab === "studio" ? await getStudioData(viewer, treeId) : null;
 
   return (
     <div className="page-stack">
       <section className="section-heading">
-        <p className="eyebrow">Tree</p>
+        <p className="eyebrow">
+          <Link className="crumb-link" href="/trees">Collection</Link> / Tree
+        </p>
         <h1>{tree.inventoryName}</h1>
         <p className="lede">
           {formatSpeciesDisplayLabel(tree.speciesName, tree.speciesSubtitle)} in {tree.styleName}. Keep photos, notes, care guidance, and planning together for this bonsai.
@@ -60,8 +68,8 @@ export default async function TreePage({ params, searchParams }: TreePageProps) 
         <p className="helper-text">
           {activeTab === "pictures"
             ? "Photos are shown from oldest to newest."
-            : activeTab === "plan"
-              ? "Keep track of current work and future direction for this tree."
+            : activeTab === "studio"
+              ? "Design where this tree is going — with the AI or from your own brief."
               : `${activeTabLabel} for ${formatSpeciesDisplayLabel(tree.speciesName, tree.speciesSubtitle)}.`}
         </p>
       </section>
@@ -97,7 +105,7 @@ export default async function TreePage({ params, searchParams }: TreePageProps) 
                 <span className="timeline-date">{formatDisplayDate(photo.capturedAt)}</span>
                 <strong>{photo.isReference ? "Reference photo" : "Photo"}</strong>
                 <p>
-                  {formatPhotoSource(photo.source)}. {photo.notes ? photo.notes : "No notes for this photo."}
+                  {formatPhotoSource(photo.source)}.{photo.notes ? ` ${photo.notes}` : ""}
                 </p>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img alt={`${tree.inventoryName} captured on ${photo.capturedAt}`} className="timeline-image" src={photo.imageUrl} />
@@ -105,31 +113,19 @@ export default async function TreePage({ params, searchParams }: TreePageProps) 
             ))
           )}
         </section>
-      ) : activeTab === "plan" ? (
-        <section className="knowledge-shell">
-          <article className="knowledge-card">
-            <span className="formula-card-label">Plan</span>
-            <h2>Development plan</h2>
-            <p>Use this space for the current work, next steps, and longer-term ideas for this bonsai.</p>
-            <form action={updateTreePlanAction} className="inline-form">
-              <input name="treeId" type="hidden" value={tree.id} />
-              <label className="field-block">
-                <span>Plan notes</span>
-                <textarea
-                  defaultValue={tree.developmentPlan ?? ""}
-                  name="developmentPlan"
-                  placeholder="Note pruning goals, wiring ideas, repot timing, branch decisions, and future direction."
-                  rows={10}
-                />
-              </label>
-              <div className="capture-step-actions">
-                <SubmitButton className="button button-solid" pendingLabel="Saving the plan...">
-                  Save plan
-                </SubmitButton>
-              </div>
-            </form>
-          </article>
-        </section>
+      ) : activeTab === "studio" && studio ? (
+        <StudioLab
+          activeTargetId={studio.activeTarget?.id ?? null}
+          aiConfigured={studio.aiConfigured}
+          createTargetStateAction={createTargetStateAction}
+          developmentPlan={tree.developmentPlan}
+          focusTargetId={focusTargetId}
+          renderProvider={studio.renderProvider}
+          styleCatalog={STYLE_OPTIONS}
+          targets={studio.targets}
+          treeId={tree.id}
+          updateTreePlanAction={updateTreePlanAction}
+        />
       ) : (
         <section className="knowledge-shell">
           {!tree.speciesCareProfile ? (
@@ -148,7 +144,7 @@ export default async function TreePage({ params, searchParams }: TreePageProps) 
                       <p>{entry.detail}</p>
                     </article>
                   ))
-                : readEntriesForTab(tree.speciesCareProfile, activeTab).map((entry) => (
+                : readEntriesForTab(tree.speciesCareProfile, activeTab as Exclude<TreeDetailTabId, "pictures" | "seasonal" | "studio">).map((entry) => (
                     <article className="knowledge-card" key={`${activeTab}-${entry.title}`}>
                       <span className="formula-card-label">{activeTabLabel}</span>
                       <h2>{entry.title}</h2>
@@ -162,6 +158,24 @@ export default async function TreePage({ params, searchParams }: TreePageProps) 
     </div>
   );
 }
+
+const STYLE_OPTIONS = [
+  { id: 1, label: "Broom (Hokidachi)" },
+  { id: 2, label: "Formal upright (Chokkan)" },
+  { id: 3, label: "Informal upright (Moyogi)" },
+  { id: 4, label: "Slanting (Shakan)" },
+  { id: 5, label: "Cascade (Kengai)" },
+  { id: 6, label: "Semi-cascade (Han-kengai)" },
+  { id: 7, label: "Literati (Bunjingi)" },
+  { id: 8, label: "Windswept (Fukinagashi)" },
+  { id: 9, label: "Double trunk (Sokan)" },
+  { id: 10, label: "Multi-trunk (Kabudachi)" },
+  { id: 11, label: "Forest (Yose-ue)" },
+  { id: 12, label: "Growing on rock (Seki-joju)" },
+  { id: 13, label: "Growing in rock (Ishisuki)" },
+  { id: 14, label: "Raft (Ikadabuki)" },
+  { id: 15, label: "Shari deadwood (Sharimiki)" },
+];
 
 function formatSpeciesDisplayLabel(label: string, subtitle: string | null) {
   return subtitle ? `${label} (${subtitle})` : label;
@@ -179,10 +193,20 @@ function formatPhotoSource(source: string) {
   return "Photo added";
 }
 
+function readSingleValue(value: string | string[] | undefined): string | null {
+  const normalized = Array.isArray(value) ? value[0] : value;
+  return normalized ?? null;
+}
+
 function readActiveTab(value: string | string[] | undefined): TreeDetailTabId {
   const normalizedValue = Array.isArray(value) ? value[0] : value;
 
-  if (normalizedValue === "care" || normalizedValue === "characteristics" || normalizedValue === "bonsai" || normalizedValue === "plan" || normalizedValue === "seasonal") {
+  if (normalizedValue === "plan") {
+    // Old bookmarks: the Plan tab became the Studio tab.
+    return "studio";
+  }
+
+  if (normalizedValue === "care" || normalizedValue === "characteristics" || normalizedValue === "bonsai" || normalizedValue === "studio" || normalizedValue === "seasonal") {
     return normalizedValue;
   }
 
@@ -191,7 +215,7 @@ function readActiveTab(value: string | string[] | undefined): TreeDetailTabId {
 
 function readEntriesForTab(
   treeProfile: TreeCareProfile,
-  activeTab: Exclude<TreeDetailTabId, "pictures" | "seasonal" | "plan">
+  activeTab: Exclude<TreeDetailTabId, "pictures" | "seasonal" | "studio">
 ): TreeKnowledgeEntry[] {
   if (activeTab === "care") {
     return treeProfile.careInstructions;
