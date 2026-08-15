@@ -546,6 +546,18 @@ export function CaptureLab({ action, errorMessage = null, treeCount, userEmail }
             <span>We will compare this photo with the trees already in your collection.</span>
           </button>
         </div>
+        <label className="field-block">
+          <span>Notes</span>
+          <textarea
+            name={captureIntent === "existing-tree" ? "notes" : undefined}
+            onChange={(event) => {
+              setNotes(event.target.value);
+            }}
+            placeholder="Optional notes for this photo — what changed, work done, season observations."
+            rows={3}
+            value={notes}
+          />
+        </label>
         <div className="capture-step-actions">
           <button className="button button-ghost" onClick={openFrontReview} type="button">
             Back

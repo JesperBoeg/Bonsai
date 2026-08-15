@@ -1,7 +1,7 @@
-import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { NextResponse } from "next/server";
 import { getViewer, resolvePhotoPathFromSegments } from "../../../../lib/bonsai";
+import { readPhotoFile } from "../../../../lib/storage-paths";
 
 type PhotoRouteProps = {
   params: Promise<{
@@ -19,24 +19,14 @@ export async function GET(_: Request, { params }: PhotoRouteProps) {
 
   try {
     const viewer = await getViewer();
-    const userScopedPath = path.join("C:/Users/agile/VSCode projects/Bonsai/data/users", viewer.id, "uploads", ...storagePath.split("/"));
-    const legacyPath = path.join("C:/Users/agile/VSCode projects/Bonsai/data/uploads", ...storagePath.split("/"));
-    let filePath = userScopedPath;
-    let buffer: Buffer;
-
-    try {
-      buffer = await readFile(userScopedPath);
-    } catch {
-      filePath = legacyPath;
-      buffer = await readFile(legacyPath);
-    }
-
+    const buffer = await readPhotoFile(viewer.id, storagePath);
     const body = new Uint8Array(buffer);
 
     return new NextResponse(body, {
       headers: {
-        "content-type": contentTypeForExtension(path.extname(filePath).toLowerCase()),
-        "cache-control": "no-store",
+        "content-type": contentTypeForExtension(path.extname(storagePath).toLowerCase()),
+        // Capture files never change once written; let the browser cache them.
+        "cache-control": "private, max-age=31536000, immutable",
       },
     });
   } catch {

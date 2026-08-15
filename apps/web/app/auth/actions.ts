@@ -2,6 +2,7 @@
 
 import type { Route } from "next";
 import { redirect } from "next/navigation";
+import { isLocalBackend } from "../../lib/backend";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 
 function readNextPath(formData: FormData) {
@@ -95,6 +96,10 @@ export async function createPasswordAccountAction(formData: FormData) {
 }
 
 export async function signOutAction() {
+  if (isLocalBackend()) {
+    redirect("/");
+  }
+
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.signOut();
 
