@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY apps/web/package.json ./apps/web/package.json
 
-RUN npm install --workspace bonsai-web --include-workspace-root=false
+RUN npm ci --workspace bonsai-web --include-workspace-root=false
 
 # The species catalog JSON is read at build time and runtime via <repo-root>/services/vision/catalog.
 COPY services/vision/catalog/*.json ./services/vision/catalog/
@@ -20,6 +20,9 @@ RUN npm run build
 # The local data store lives at <repo-root>/data — mount a persistent disk here.
 RUN mkdir -p /app/data
 
+# NODE_ENV is set after `npm ci` on purpose: setting it earlier would make npm
+# skip the devDependencies the build needs.
+ENV NODE_ENV=production
 ENV PORT=3000
 EXPOSE 3000
 

@@ -9,8 +9,12 @@ services:
     region: oregon
     dockerfilePath: ./services/vision/Dockerfile
     dockerContext: ./services/vision
-    healthCheckPath: /docs
+    healthCheckPath: /health
     autoDeploy: true
+    disk:
+      name: hf-cache
+      mountPath: /app/.hf-cache   # HF_HOME — model weights survive deploys/restarts
+      sizeGB: 2
     # First boot downloads model weights and embeds the reference catalog (several minutes).
 
   # ----- Next.js web app -----
@@ -28,6 +32,10 @@ services:
       mountPath: /app/data    # the on-disk per-user store and photo uploads
       sizeGB: 1
     envVars:
+      # WARNING: this Supabase project (epqxygxvvlsobbyhhnke) no longer resolves
+      # in DNS — it appears paused or deleted. Restore or recreate it in the
+      # Supabase dashboard, then update the URL and anon key below (and re-apply
+      # migrations with `npx supabase db push`) before deploying.
       - key: NEXT_PUBLIC_SUPABASE_URL
         value: https://epqxygxvvlsobbyhhnke.supabase.co
       - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -38,3 +46,12 @@ services:
       # Set after the vision service is live, to its full https URL (e.g. https://bonsai-vision.onrender.com).
       - key: VISION_SERVICE_URL
         sync: false
+      # API keys are entered in the Render dashboard, never committed.
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false            # optional — only needed while BONSAI_IMAGE_PROVIDER=gemini
+      - key: BONSAI_IMAGE_PROVIDER
+        value: gemini
+      - key: BONSAI_DATA_BACKEND
+        value: supabase

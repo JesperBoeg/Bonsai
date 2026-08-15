@@ -1,88 +1,30 @@
-name: Main CI/CD
+name: CI
+
+# Quality gate only. Deployment is handled by Render: both services in
+# render.yaml have autoDeploy enabled, so Render builds and deploys the
+# containers on every push to main. This workflow just has to stay green.
 
 on:
   push:
+    branches:
+      - main
+  pull_request:
     branches:
       - main
   workflow_dispatch:
 
 env:
   NEXT_TELEMETRY_DISABLED: "1"
-  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-  NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
-  VISION_SERVICE_URL: ${{ secrets.VISION_SERVICE_URL }}
 
 jobs:
-  web-build:
-    name: Web build
+  web:
+    name: Web lint and build
     runs-on: ubuntu-latest
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install web dependencies
-        run: npm ci
-
-      - name: Build web app
-        run: npm run build:web
-
-  vision-test-catalog:
-    name: Vision test catalog recognition
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-
-      - name: Install vision service dependencies
-        run: python -m pip install --upgrade pip ; python -m pip install -e ./services/vision
-
-      - name: Run catalog recognition test file
-        working-directory: services/vision
-        run: python -m unittest tests/test_catalog_recognition.py
-
-  vision-test-leaf-index:
-    name: Vision test open license leaf index
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-
-      - name: Install vision service dependencies
-        run: python -m pip install --upgrade pip ; python -m pip install -e ./services/vision
-
-      - name: Run open license leaf index test file
-        working-directory: services/vision
-        run: python -m unittest tests/test_open_license_leaf_index.py
-
-  deploy-web:
-    name: Deploy web app
-    runs-on: ubuntu-latest
-    needs:
-      - web-build
-      - vision-test-catalog
-      - vision-test-leaf-index
-    environment:
-      name: production
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+      VISION_SERVICE_URL: ${{ secrets.VISION_SERVICE_URL }}
 
     steps:
       - name: Check out repository
@@ -97,27 +39,38 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Pull Vercel project settings
-        run: npx vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      - name: Lint web app
+        run: npm run lint:web
 
-      - name: Build Vercel deployment bundle
-        run: npx vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      - name: Build web app
+        run: npm run build:web
 
-      - name: Deploy to production
-        id: vercel-deploy
+  vision-tests:
+    name: Vision service tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install vision service
+        shell: bash
         run: |
-          $deploymentUrl = npx vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
-          "deployment_url=$deploymentUrl" >> $env:GITHUB_OUTPUT
-        shell: pwsh
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          python -m pip install --upgrade pip && \
+          python -m pip install -e ./services/vision
 
-      - name: Print deployment URL
-        run: echo "Production deploy completed at ${{ steps.vercel-deploy.outputs.deployment_url }}"
+      - name: Run vision unit tests
+        working-directory: services/vision
+        shell: bash
+        # Pixel encoders keep CI fast and avoid downloading Hugging Face weights.
+        env:
+          BONSAI_IDENTITY_ENCODER: pixel
+          BONSAI_TAXONOMY_ENCODER: pixel
+        run: |
+          python -m unittest tests/test_catalog_recognition.py && \
+          python -m unittest tests/test_open_license_leaf_index.py

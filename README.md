@@ -34,9 +34,9 @@ Bonsai is being built as a phone-friendly web application with a separate vision
 
 ## CI/CD
 
-GitHub Actions can run the web production build plus the two vision test files on every push to `main`, then deploy the Next.js app to Vercel if all checks pass.
+GitHub Actions is a quality gate only: it lints and builds the web app and runs the two vision test files on every push and pull request to `main`. Deployment is handled by Render — both services in `render.yaml` have `autoDeploy` enabled, so Render builds and deploys the containers on every push to `main`.
 
-The workflow and required secrets are documented in [C:/Users/agile/VSCode projects/Bonsai/.github/DEPLOYMENT.md](C:/Users/agile/VSCode%20projects/Bonsai/.github/DEPLOYMENT.md).
+The workflow, required secrets, and Render environment variables are documented in [.github/DEPLOYMENT.md](.github/DEPLOYMENT.md); the full deploy runbook is in [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## Architecture notes
 
