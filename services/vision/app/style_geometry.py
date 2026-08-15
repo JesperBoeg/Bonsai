@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from functools import lru_cache
 from io import BytesIO
 
 import numpy as np
 from PIL import Image, ImageDraw
+
+from app.caching import locked_lru_cache
 
 
 GRID_SIZE = 16
@@ -171,7 +172,7 @@ def extract_center_background_pixels(image: np.ndarray, mask: np.ndarray) -> np.
     return image[center_mask & ~mask]
 
 
-@lru_cache(maxsize=1)
+@locked_lru_cache(maxsize=1)
 def load_style_prototype_descriptors() -> dict[str, np.ndarray]:
     descriptors: dict[str, np.ndarray] = {}
 

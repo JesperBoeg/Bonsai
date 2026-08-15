@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from functools import lru_cache
 from io import BytesIO
 import os
 
 import numpy as np
 from PIL import Image, ImageOps
+
+from app.caching import locked_lru_cache
 
 
 PIXEL_BACKEND = "pixel-rgb-16"
@@ -13,11 +14,11 @@ DINOV2_BACKEND = "dinov2-base-pooler"
 
 
 def get_identity_encoder_name() -> str:
-    return parse_encoder_backend(os.getenv("BONSAI_IDENTITY_ENCODER", "pixel"))
+    return parse_encoder_backend(os.getenv("BONSAI_IDENTITY_ENCODER", "dinov2"))
 
 
 def get_taxonomy_encoder_name() -> str:
-    return parse_encoder_backend(os.getenv("BONSAI_TAXONOMY_ENCODER", "pixel"))
+    return parse_encoder_backend(os.getenv("BONSAI_TAXONOMY_ENCODER", "dinov2"))
 
 
 def get_leaf_encoder_name() -> str:
@@ -90,7 +91,7 @@ def compute_dinov2_embedding(image_bytes: bytes) -> list[float]:
     return (vector / norm).tolist()
 
 
-@lru_cache(maxsize=1)
+@locked_lru_cache(maxsize=1)
 def load_dinov2_components():
     from transformers import AutoImageProcessor, AutoModel
 
@@ -99,3 +100,7 @@ def load_dinov2_components():
     model = AutoModel.from_pretrained(model_name)
     model.eval()
     return processor, model
+
+
+def dinov2_components_loaded() -> bool:
+    return load_dinov2_components.cache_info().currsize > 0

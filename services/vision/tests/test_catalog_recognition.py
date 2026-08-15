@@ -1,10 +1,19 @@
 from __future__ import annotations
 
+import os
+
+# Keep the suite hermetic: the service defaults to DINOv2 encoders, which would
+# download Hugging Face weights on first use. The pixel override below also
+# exercises the env-based encoder selection path.
+os.environ.setdefault("BONSAI_IDENTITY_ENCODER", "pixel")
+os.environ.setdefault("BONSAI_TAXONOMY_ENCODER", "pixel")
+
 from collections import Counter
 from io import BytesIO
 import json
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 from PIL import Image, ImageDraw
@@ -12,19 +21,27 @@ from PIL import Image, ImageDraw
 from app.main import (
     Candidate,
     LeafReferenceCatalogMatch,
+    RecognitionMatch,
     ReferenceCatalogMatch,
     app,
     canonicalize_species_label,
     compute_embedding,
     compute_taxonomy_embedding,
     cosine_similarity,
+    rank_candidates,
     rank_leaf_reference_predictions,
     load_reference_catalog_embeddings,
     rank_reference_predictions,
     rank_reference_catalog_matches,
     rank_style_reference_catalog_matches,
+    should_recommend_hosted_fallback,
 )
-from app.encoders import PIXEL_BACKEND
+from app.encoders import (
+    DINOV2_BACKEND,
+    PIXEL_BACKEND,
+    get_identity_encoder_name,
+    get_taxonomy_encoder_name,
+)
 from app.style_geometry import compute_style_geometry_descriptor, score_style_prototype_similarity, validate_style_photo_background
 from app.style_geometry import compute_style_geometry_metrics
 from scripts.build_taxonomy_benchmark import build_benchmark_manifest
@@ -356,7 +373,7 @@ class CatalogRecognitionTest(unittest.TestCase):
     def test_style_photo_background_validation_accepts_centered_solid_panel(self) -> None:
         self.assertIsNone(validate_style_photo_background(build_panel_background_test_image()))
 
-    def test_recognize_rejects_busy_background_for_existing_tree_candidates(self) -> None:
+    def test_recognize_accepts_busy_background_for_identity_only_captures(self) -> None:
         response = self.client.post(
             "/recognize",
             files={"image": ("front.png", build_style_quality_test_image(busy_background=True), "image/png")},
@@ -370,12 +387,180 @@ class CatalogRecognitionTest(unittest.TestCase):
                             "embeddingModel": "pixel-rgb-16",
                         }
                     ]
-                )
+                ),
+                "include_identity_matches": "true",
             },
+        )
+
+        self.assertEqual(200, response.status_code)
+        payload = response.json()
+        # The dimension-mismatched candidate scores 0.0, so the shortlist is
+        # empty and the fallback fires for identity reasons only: unrequested
+        # species/style streams must never appear in the reason.
+        self.assertTrue(payload["hosted_fallback_recommended"])
+        self.assertIn("identity matcher", payload["fallback_reason"])
+        self.assertNotIn("species", payload["fallback_reason"])
+        self.assertNotIn("style", payload["fallback_reason"])
+
+    def test_recognize_rejects_busy_background_when_style_predictions_requested(self) -> None:
+        response = self.client.post(
+            "/recognize",
+            files={"image": ("front.png", build_style_quality_test_image(busy_background=True), "image/png")},
+            data={"include_style_predictions": "true"},
         )
 
         self.assertEqual(422, response.status_code)
         self.assertIn("solid background", response.json().get("detail", ""))
+
+    def test_recognize_skips_hosted_fallback_for_confident_identity_match(self) -> None:
+        image_bytes = build_style_quality_test_image(busy_background=False)
+        matching_embedding = compute_embedding(image_bytes)
+        response = self.client.post(
+            "/recognize",
+            files={"image": ("front.png", image_bytes, "image/png")},
+            data={
+                "candidates": json.dumps(
+                    [
+                        {
+                            "treeId": "tree-1",
+                            "photoId": "photo-1",
+                            "embedding": matching_embedding,
+                            "embeddingModel": get_identity_encoder_name(),
+                        }
+                    ]
+                ),
+                "include_identity_matches": "true",
+            },
+        )
+
+        self.assertEqual(200, response.status_code)
+        payload = response.json()
+        self.assertEqual("tree-1", payload["matched_tree_id"])
+        self.assertFalse(payload["hosted_fallback_recommended"])
+        self.assertIsNone(payload["fallback_reason"])
+
+    def test_recognize_returns_422_for_malformed_candidates_json(self) -> None:
+        response = self.client.post(
+            "/recognize",
+            files={"image": ("front.png", build_style_quality_test_image(busy_background=False), "image/png")},
+            data={"candidates": "{not valid json", "include_identity_matches": "true"},
+        )
+
+        self.assertEqual(422, response.status_code)
+        self.assertIn("JSON", response.json().get("detail", ""))
+
+    def test_recognize_returns_422_for_invalid_candidate_entries(self) -> None:
+        response = self.client.post(
+            "/recognize",
+            files={"image": ("front.png", build_style_quality_test_image(busy_background=False), "image/png")},
+            data={
+                "candidates": json.dumps([{"treeId": "tree-1", "embedding": [0.1, 0.2]}]),
+                "include_identity_matches": "true",
+            },
+        )
+
+        self.assertEqual(422, response.status_code)
+        self.assertIn("candidates failed validation", response.json().get("detail", ""))
+
+    def test_recognize_returns_422_for_non_image_upload(self) -> None:
+        response = self.client.post(
+            "/recognize",
+            files={"image": ("notes.txt", b"this is not an image", "text/plain")},
+        )
+
+        self.assertEqual(422, response.status_code)
+        self.assertIn("not a readable image", response.json().get("detail", ""))
+
+    def test_rank_candidates_scores_each_candidate_in_its_own_encoder_space(self) -> None:
+        query_embeddings = {
+            PIXEL_BACKEND: [1.0, 0.0],
+            DINOV2_BACKEND: [0.0, 1.0],
+        }
+        computed_backends: list[str] = []
+
+        def fake_compute_embedding_backend(image_bytes: bytes, encoder_name: str) -> list[float]:
+            computed_backends.append(encoder_name)
+            return query_embeddings[encoder_name]
+
+        candidates = [
+            Candidate(tree_id="tree-pixel", photo_id="p1", embedding=[1.0, 0.0], embedding_model=PIXEL_BACKEND),
+            Candidate(tree_id="tree-dino", photo_id="p2", embedding=[0.0, 1.0], embedding_model=DINOV2_BACKEND),
+            Candidate(tree_id="tree-legacy-null", photo_id="p3", embedding=[1.0, 0.0]),
+            Candidate(tree_id="tree-unknown", photo_id="p4", embedding=[1.0, 0.0], embedding_model="clip-vit"),
+        ]
+
+        with (
+            patch("app.main.compute_embedding_backend", side_effect=fake_compute_embedding_backend),
+            patch("app.main.get_identity_encoder_name", return_value=PIXEL_BACKEND),
+            self.assertLogs("bonsai.vision", level="WARNING") as captured_logs,
+        ):
+            matches = rank_candidates(b"unused-image-bytes", query_embeddings[PIXEL_BACKEND], candidates)
+
+        # Every known-model candidate matches its own encoder space perfectly;
+        # the unknown-model candidate is skipped with a warning.
+        self.assertEqual({"tree-pixel", "tree-dino", "tree-legacy-null"}, {match.tree_id for match in matches})
+        for match in matches:
+            self.assertAlmostEqual(1.0, match.score, places=6)
+        # The pixel query is reused from the identity embedding; only the
+        # dinov2 query embedding is computed on demand, exactly once.
+        self.assertEqual([DINOV2_BACKEND], computed_backends)
+        self.assertTrue(any("clip-vit" in line for line in captured_logs.output))
+
+    def test_hosted_fallback_only_factors_requested_streams(self) -> None:
+        recommended, reason = should_recommend_hosted_fallback(
+            [], [], [], identity_requested=False, species_requested=False, style_requested=False
+        )
+        self.assertFalse(recommended)
+        self.assertIsNone(reason)
+
+        confident_match = RecognitionMatch(tree_id="tree-1", photo_id="photo-1", score=0.95)
+        recommended, reason = should_recommend_hosted_fallback(
+            [confident_match], [], [], identity_requested=True, species_requested=False, style_requested=False
+        )
+        self.assertFalse(recommended)
+        self.assertIsNone(reason)
+
+        recommended, reason = should_recommend_hosted_fallback(
+            [], [], [], identity_requested=True, species_requested=False, style_requested=False
+        )
+        self.assertTrue(recommended)
+        self.assertIn("identity matcher", reason or "")
+        self.assertNotIn("species", reason or "")
+        self.assertNotIn("style", reason or "")
+
+    def test_recognize_leaf_returns_503_when_leaf_index_is_degraded(self) -> None:
+        from app.main import SERVICE_STATE
+
+        with patch.dict(SERVICE_STATE, {"leaf_index_error": "Open-license leaf index is missing."}):
+            response = self.client.post(
+                "/recognize-leaf",
+                files={"image": ("leaf.png", build_style_quality_test_image(busy_background=False), "image/png")},
+            )
+
+        self.assertEqual(503, response.status_code)
+        self.assertIn("Leaf recognition is unavailable", response.json().get("detail", ""))
+
+    def test_health_reports_readiness_flags(self) -> None:
+        response = self.client.get("/health")
+
+        self.assertEqual(200, response.status_code)
+        payload = response.json()
+        self.assertEqual("ok", payload["status"])
+        self.assertIsInstance(payload["models_loaded"], bool)
+        self.assertIsInstance(payload["leaf_index_ready"], bool)
+        self.assertIsInstance(payload["style_catalog_ready"], bool)
+
+    def test_identity_and_taxonomy_encoders_default_to_dinov2_with_env_override(self) -> None:
+        with patch.dict(os.environ):
+            os.environ.pop("BONSAI_IDENTITY_ENCODER", None)
+            os.environ.pop("BONSAI_TAXONOMY_ENCODER", None)
+            self.assertEqual(DINOV2_BACKEND, get_identity_encoder_name())
+            self.assertEqual(DINOV2_BACKEND, get_taxonomy_encoder_name())
+
+            os.environ["BONSAI_IDENTITY_ENCODER"] = "pixel"
+            os.environ["BONSAI_TAXONOMY_ENCODER"] = "pixel"
+            self.assertEqual(PIXEL_BACKEND, get_identity_encoder_name())
+            self.assertEqual(PIXEL_BACKEND, get_taxonomy_encoder_name())
 
     def test_style_prototype_prior_prefers_moyogi_over_shakan_for_curved_upright_tree(self) -> None:
         descriptor = compute_style_geometry_descriptor(build_style_prototype_query_image("moyogi"))

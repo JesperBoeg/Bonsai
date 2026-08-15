@@ -4,3 +4,11 @@ bonsai_vision.egg-info/
 **/__pycache__/
 *.pyc
 .hf-cache/
+tmp_style_masks/
+
+# Build-time-only catalog assets (~600 MB). The runtime image only needs
+# catalog/captured/, catalog/open_license_leaf_patches/, and the catalog
+# *.json manifests, which stay included.
+catalog/open_license_source_images/
+catalog/leaves/
+catalog/review/

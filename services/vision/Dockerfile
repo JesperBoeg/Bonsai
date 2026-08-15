@@ -8,17 +8,13 @@ ENV PYTHONUNBUFFERED=1 \
 WORKDIR /app
 
 # CPU-only PyTorch first, so the heavy CUDA wheels are never pulled in transitively.
-RUN pip install --index-url https://download.pytorch.org/whl/cpu torch
+RUN pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu torch torchvision
 
-# Remaining runtime dependencies (kept in sync with pyproject.toml).
-RUN pip install \
-    "fastapi>=0.115.0" \
-    "numpy>=2.1.0" \
-    "pillow>=11.0.0" \
-    "pydantic>=2.9.0" \
-    "python-multipart>=0.0.20" \
-    "transformers>=5.0.0" \
-    "uvicorn[standard]>=0.32.0"
+# Install the remaining dependencies straight from pyproject.toml (single source
+# of truth for pins). torch is already satisfied by the CPU wheel above, so this
+# does not pull CUDA wheels.
+COPY pyproject.toml ./
+RUN pip install --no-cache-dir .
 
 # Application code and the reference catalog (images are embedded at startup).
 COPY app ./app
@@ -26,6 +22,11 @@ COPY catalog ./catalog
 
 ENV PORT=8001
 EXPOSE 8001
+
+# Generous start period: the first boot downloads model weights and embeds the
+# reference catalog, which takes several minutes.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=300s --retries=3 \
+  CMD python -c "import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:' + os.environ.get('PORT', '8001') + '/health', timeout=4)"
 
 # Model weights are downloaded from Hugging Face on first boot and cached in HF_HOME.
 CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT}"]

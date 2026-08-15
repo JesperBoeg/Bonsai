@@ -1,20 +1,25 @@
 from collections import defaultdict
 from contextlib import asynccontextmanager
-from functools import lru_cache
 import json
+import logging
 import os
 from pathlib import Path
 
 import numpy as np
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
-from pydantic import AliasChoices, BaseModel, Field, TypeAdapter
+from PIL import UnidentifiedImageError
+from pydantic import AliasChoices, BaseModel, Field, TypeAdapter, ValidationError
 from starlette.concurrency import run_in_threadpool
 
+from app.caching import locked_lru_cache
 from app.encoders import (
+    DINOV2_BACKEND,
+    PIXEL_BACKEND,
     compute_embedding_backend,
     compute_identity_embedding,
     compute_leaf_embedding,
     compute_taxonomy_embedding,
+    dinov2_components_loaded,
     get_identity_encoder_name,
     get_leaf_encoder_name,
     get_taxonomy_encoder_name,
@@ -28,20 +33,60 @@ from app.style_geometry import (
     cosine_similarity as geometry_cosine_similarity,
     score_style_prototype_similarity,
     StyleGeometryMetrics,
-    validate_style_photo_background,
 )
+
+
+logger = logging.getLogger("bonsai.vision")
+
+KNOWN_CANDIDATE_EMBEDDING_MODELS = {PIXEL_BACKEND, DINOV2_BACKEND}
+DEFAULT_CANDIDATE_EMBEDDING_MODEL = PIXEL_BACKEND
+NON_IMAGE_UPLOAD_DETAIL = "Uploaded file is not a readable image. Send a JPEG, PNG, or similar image file."
+
+SERVICE_STATE: dict[str, object] = {
+    "leaf_index_ready": False,
+    "leaf_index_error": None,
+    "style_catalog_ready": False,
+}
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    preload_runtime_dependencies()
+    yield
+
+
+def preload_runtime_dependencies() -> None:
     if {
         get_identity_encoder_name(),
         get_taxonomy_encoder_name(),
         get_leaf_encoder_name(),
-    } & {"dinov2-base-pooler"}:
-        load_dinov2_components()
-    load_style_reference_catalog_features(get_taxonomy_encoder_name())
-    yield
+    } & {DINOV2_BACKEND}:
+        try:
+            load_dinov2_components()
+        except Exception:
+            logger.exception("Failed to preload DINOv2 components; embedding requests will retry lazily.")
+
+    try:
+        get_style_reference_features()
+    except Exception:
+        logger.exception("Failed to preload the style reference catalog; style predictions will retry lazily.")
+
+    preload_leaf_reference_index()
+
+
+def preload_leaf_reference_index() -> None:
+    try:
+        entries = load_leaf_reference_catalog_embeddings(get_leaf_encoder_name())
+    except Exception as error:
+        SERVICE_STATE["leaf_index_error"] = str(error)
+        logger.exception(
+            "Open-license leaf reference index failed to load at startup; "
+            "/recognize-leaf is degraded and will return 503."
+        )
+        return
+
+    SERVICE_STATE["leaf_index_ready"] = True
+    logger.info("Leaf reference index preloaded with %d entries.", len(entries))
 
 
 app = FastAPI(
@@ -141,8 +186,25 @@ class SpeciesProgramEntry(BaseModel):
 
 
 @app.get("/health")
-def health() -> dict[str, str]:
-    return {"status": "ok"}
+def health() -> dict[str, bool | str]:
+    return {
+        "status": "ok",
+        "models_loaded": are_required_models_loaded(),
+        "leaf_index_ready": bool(SERVICE_STATE["leaf_index_ready"]),
+        "style_catalog_ready": bool(SERVICE_STATE["style_catalog_ready"]),
+    }
+
+
+def are_required_models_loaded() -> bool:
+    required_backends = {
+        get_identity_encoder_name(),
+        get_taxonomy_encoder_name(),
+        get_leaf_encoder_name(),
+    }
+    if DINOV2_BACKEND not in required_backends:
+        return True
+
+    return dinov2_components_loaded()
 
 
 @app.post("/recognize", response_model=RecognitionResponse)
@@ -169,21 +231,37 @@ def recognize_sync(
     include_identity_matches: bool,
     include_style_predictions: bool,
 ) -> RecognitionResponse:
+    try:
+        return recognize_sync_inner(
+            image_bytes,
+            typed_candidates,
+            include_identity_matches,
+            include_style_predictions,
+        )
+    except UnidentifiedImageError as error:
+        raise HTTPException(status_code=422, detail=NON_IMAGE_UPLOAD_DETAIL) from error
+
+
+def recognize_sync_inner(
+    image_bytes: bytes,
+    typed_candidates: list[Candidate],
+    include_identity_matches: bool,
+    include_style_predictions: bool,
+) -> RecognitionResponse:
+    # The background-quality gate only guards style predictions: geometry-based
+    # style scoring needs a clean silhouette. Identity-only captures must accept
+    # arbitrary (e.g. garden) backgrounds.
     style_photo_analysis = analyze_style_photo(image_bytes) if include_style_predictions else None
-    background_rejection = (
-        style_photo_analysis.background_guidance
-        if style_photo_analysis is not None
-        else validate_style_photo_background(image_bytes)
-    )
-    if background_rejection is not None:
-        raise HTTPException(status_code=422, detail=background_rejection)
+    if style_photo_analysis is not None and style_photo_analysis.background_guidance is not None:
+        raise HTTPException(status_code=422, detail=style_photo_analysis.background_guidance)
 
     identity_embedding = compute_embedding(image_bytes)
     taxonomy_embedding = compute_taxonomy_embedding(image_bytes) if include_style_predictions else None
     style_geometry_descriptor = style_photo_analysis.descriptor if style_photo_analysis is not None else None
     style_geometry_metrics = style_photo_analysis.metrics if style_photo_analysis is not None else None
 
-    ranked_matches = rank_candidates(identity_embedding, typed_candidates) if include_identity_matches and typed_candidates else []
+    identity_matching_ran = include_identity_matches and bool(typed_candidates)
+    ranked_matches = rank_candidates(image_bytes, identity_embedding, typed_candidates) if identity_matching_ran else []
     top_match = ranked_matches[0] if ranked_matches else None
     style_reference_matches = (
         rank_style_reference_catalog_matches(
@@ -205,14 +283,15 @@ def recognize_sync(
         if top_match.score >= get_confident_identity_match_threshold():
             matched_tree_id = top_match.tree_id
 
-    hosted_fallback_recommended, fallback_reason = (
-        should_recommend_hosted_fallback(
-            ranked_matches,
-            species_predictions,
-            style_predictions,
-        )
-        if include_identity_matches
-        else (False, None)
+    hosted_fallback_recommended, fallback_reason = should_recommend_hosted_fallback(
+        ranked_matches,
+        species_predictions,
+        style_predictions,
+        identity_requested=identity_matching_ran,
+        # /recognize never computes species predictions; that stream comes from
+        # /recognize-leaf, so it must never factor into the fallback decision.
+        species_requested=False,
+        style_requested=include_style_predictions,
     )
 
     return RecognitionResponse(
@@ -238,40 +317,99 @@ async def recognize_leaf(
 
 
 def recognize_leaf_sync(image_bytes: bytes) -> LeafRecognitionResponse:
-    leaf_embedding = compute_leaf_embedding(image_bytes)
-    leaf_reference_matches = rank_leaf_reference_catalog_matches(leaf_embedding)
+    reference_index = get_leaf_reference_index()
+
+    try:
+        leaf_embedding = compute_leaf_embedding(image_bytes)
+    except UnidentifiedImageError as error:
+        raise HTTPException(status_code=422, detail=NON_IMAGE_UPLOAD_DETAIL) from error
+
+    leaf_reference_matches = rank_leaf_reference_catalog_matches(leaf_embedding, reference_index)
     species_predictions = rank_leaf_reference_predictions(leaf_reference_matches)
 
     return LeafRecognitionResponse(
         embedding=leaf_embedding,
         embedding_model=get_leaf_encoder_name(),
         species_predictions=species_predictions,
-        reference_count=len(load_leaf_reference_catalog_embeddings(get_leaf_encoder_name())),
+        reference_count=len(reference_index),
     )
+
+
+def get_leaf_reference_index() -> list[tuple[LeafReferenceCatalogEntry, list[float]]]:
+    known_error = SERVICE_STATE["leaf_index_error"]
+    if known_error is not None:
+        raise HTTPException(status_code=503, detail=f"Leaf recognition is unavailable: {known_error}")
+
+    try:
+        entries = load_leaf_reference_catalog_embeddings(get_leaf_encoder_name())
+    except Exception as error:
+        SERVICE_STATE["leaf_index_error"] = str(error)
+        logger.exception("Open-license leaf reference index failed to load; /recognize-leaf is degraded.")
+        raise HTTPException(status_code=503, detail=f"Leaf recognition is unavailable: {error}") from error
+
+    SERVICE_STATE["leaf_index_ready"] = True
+    return entries
 
 
 def parse_candidates(raw_candidates: str) -> list[Candidate]:
     if not raw_candidates:
         return []
 
-    candidate_payload = json.loads(raw_candidates)
+    try:
+        candidate_payload = json.loads(raw_candidates)
+    except json.JSONDecodeError as error:
+        raise HTTPException(
+            status_code=422,
+            detail=f"candidates must be a JSON array: {error.msg} (line {error.lineno}, column {error.colno}).",
+        ) from error
+
     adapter = TypeAdapter(list[Candidate])
-    return adapter.validate_python(candidate_payload)
+    try:
+        return adapter.validate_python(candidate_payload)
+    except ValidationError as error:
+        first_error = error.errors()[0]
+        location = ".".join(str(part) for part in first_error["loc"]) or "candidates"
+        raise HTTPException(
+            status_code=422,
+            detail=f"candidates failed validation at {location}: {first_error['msg']}",
+        ) from error
 
 
 def compute_embedding(image_bytes: bytes) -> list[float]:
     return compute_identity_embedding(image_bytes)
 
 
-def rank_candidates(embedding: list[float], candidates: list[Candidate]) -> list[RecognitionMatch]:
+def rank_candidates(
+    image_bytes: bytes,
+    identity_embedding: list[float],
+    candidates: list[Candidate],
+) -> list[RecognitionMatch]:
+    """Score each candidate against a query embedding from its own encoder space.
+
+    Candidates are grouped by their stored `embedding_model` (null means the
+    legacy pixel encoder); one query embedding is computed per encoder family
+    present. Candidates with unknown model names are skipped with a warning.
+    """
     ranked_matches: list[RecognitionMatch] = []
-    identity_encoder_name = get_identity_encoder_name()
+    query_embeddings_by_model: dict[str, list[float]] = {get_identity_encoder_name(): identity_embedding}
 
     for candidate in candidates:
-        if candidate.embedding_model and candidate.embedding_model != identity_encoder_name:
+        model_name = candidate.embedding_model or DEFAULT_CANDIDATE_EMBEDDING_MODEL
+        if model_name not in KNOWN_CANDIDATE_EMBEDDING_MODELS:
+            logger.warning(
+                "Skipping candidate tree=%s photo=%s with unknown embedding model %r.",
+                candidate.tree_id,
+                candidate.photo_id,
+                model_name,
+            )
             continue
 
-        score = cosine_similarity(embedding, candidate.embedding)
+        query_embedding = query_embeddings_by_model.get(model_name)
+        if query_embedding is None:
+            query_embedding = compute_embedding_backend(image_bytes, model_name)
+            query_embeddings_by_model[model_name] = query_embedding
+
+        score = cosine_similarity(query_embedding, candidate.embedding)
         ranked_matches.append(
             RecognitionMatch(
                 tree_id=candidate.tree_id,
@@ -325,7 +463,7 @@ def rank_style_reference_catalog_matches(
     geometry_weight = get_style_geometry_weight()
     prototype_weight = get_style_prototype_weight()
 
-    for entry, reference_embedding, reference_geometry_descriptor in load_style_reference_catalog_features(get_taxonomy_encoder_name()):
+    for entry, reference_embedding, reference_geometry_descriptor in get_style_reference_features():
         if not entry.use_for_style_eval:
             continue
 
@@ -351,10 +489,13 @@ def rank_style_reference_catalog_matches(
     return matches[:5]
 
 
-def rank_leaf_reference_catalog_matches(embedding: list[float]) -> list[LeafReferenceCatalogMatch]:
+def rank_leaf_reference_catalog_matches(
+    embedding: list[float],
+    reference_index: list[tuple[LeafReferenceCatalogEntry, list[float]]],
+) -> list[LeafReferenceCatalogMatch]:
     matches: list[LeafReferenceCatalogMatch] = []
 
-    for entry, reference_embedding in load_leaf_reference_catalog_embeddings(get_leaf_encoder_name()):
+    for entry, reference_embedding in reference_index:
         score = cosine_similarity(embedding, reference_embedding)
         matches.append(
             LeafReferenceCatalogMatch(
@@ -459,7 +600,7 @@ def resolve_species_program_entry(label: str) -> SpeciesProgramEntry | None:
     return load_species_prediction_lookup().get(normalize_lookup_key(label))
 
 
-@lru_cache(maxsize=1)
+@locked_lru_cache(maxsize=1)
 def load_species_prediction_lookup() -> dict[str, SpeciesProgramEntry]:
     lookup: dict[str, SpeciesProgramEntry] = {}
 
@@ -470,7 +611,7 @@ def load_species_prediction_lookup() -> dict[str, SpeciesProgramEntry]:
     return lookup
 
 
-@lru_cache(maxsize=1)
+@locked_lru_cache(maxsize=1)
 def load_species_program_entries() -> list[SpeciesProgramEntry]:
     species_program_path = Path(__file__).resolve().parents[1] / "catalog" / "species_program.json"
     if not species_program_path.exists():
@@ -497,7 +638,7 @@ def normalize_lookup_key(value: str) -> str:
     return value.strip().lower()
 
 
-@lru_cache(maxsize=4)
+@locked_lru_cache(maxsize=4)
 def load_reference_catalog_embeddings(encoder_name: str) -> list[tuple[ReferenceCatalogEntry, list[float]]]:
     catalog_path = Path(__file__).resolve().parents[1] / "catalog" / "bonsai_reference_catalog.json"
     raw_entries = json.loads(catalog_path.read_text(encoding="utf-8"))
@@ -514,7 +655,13 @@ def load_reference_catalog_embeddings(encoder_name: str) -> list[tuple[Reference
     return loaded_entries
 
 
-@lru_cache(maxsize=4)
+def get_style_reference_features() -> list[tuple[ReferenceCatalogEntry, list[float], list[float]]]:
+    features = load_style_reference_catalog_features(get_taxonomy_encoder_name())
+    SERVICE_STATE["style_catalog_ready"] = True
+    return features
+
+
+@locked_lru_cache(maxsize=4)
 def load_style_reference_catalog_features(encoder_name: str) -> list[tuple[ReferenceCatalogEntry, list[float], list[float]]]:
     catalog_path = Path(__file__).resolve().parents[1] / "catalog" / "bonsai_reference_catalog.json"
     raw_entries = json.loads(catalog_path.read_text(encoding="utf-8"))
@@ -539,7 +686,7 @@ def load_style_reference_catalog_features(encoder_name: str) -> list[tuple[Refer
     return loaded_entries
 
 
-@lru_cache(maxsize=4)
+@locked_lru_cache(maxsize=4)
 def load_leaf_reference_catalog_embeddings(encoder_name: str) -> list[tuple[LeafReferenceCatalogEntry, list[float]]]:
     catalog_path = Path(__file__).resolve().parents[1] / "catalog" / "open_license_leaf_index.json"
     if not catalog_path.exists():
@@ -635,16 +782,27 @@ def should_recommend_hosted_fallback(
     candidate_matches: list[RecognitionMatch],
     species_predictions: list[Prediction],
     style_predictions: list[Prediction],
+    *,
+    identity_requested: bool,
+    species_requested: bool,
+    style_requested: bool,
 ) -> tuple[bool, str | None]:
+    """Recommend the hosted fallback only based on streams that actually ran.
+
+    A stream that was never requested (empty by construction) must not count
+    as "uncertain" and must never appear in the fallback reason.
+    """
     reasons: list[str] = []
 
-    if is_prediction_uncertain(species_predictions, get_species_uncertainty_floor()):
+    if species_requested and is_prediction_uncertain(species_predictions, get_species_uncertainty_floor()):
         reasons.append("species suggestions are low-confidence or tightly clustered")
 
-    if is_prediction_uncertain(style_predictions, get_style_uncertainty_floor()):
+    if style_requested and is_prediction_uncertain(style_predictions, get_style_uncertainty_floor()):
         reasons.append("style suggestions are low-confidence or tightly clustered")
 
-    if not candidate_matches:
+    if identity_requested and (
+        not candidate_matches or candidate_matches[0].score < get_identity_suggestion_score_floor()
+    ):
         reasons.append("identity matcher found no plausible existing-tree shortlist")
 
     if not reasons:
