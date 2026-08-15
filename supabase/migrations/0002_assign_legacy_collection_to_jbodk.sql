@@ -9,7 +9,11 @@ begin
     limit 1;
 
     if target_owner_id is null then
-        raise exception 'Supabase user jbodk@hotmail.com does not exist.';
+        -- One-off backfill for a specific legacy account. On any project where
+        -- that account does not exist (fresh installs, local stacks), skip
+        -- instead of failing the whole migration chain.
+        raise notice 'Skipping legacy backfill: user jbodk@hotmail.com does not exist.';
+        return;
     end if;
 
     insert into public.species (id, slug, latin_name, common_name)
