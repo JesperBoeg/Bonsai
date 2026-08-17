@@ -64,9 +64,27 @@ async function restoreDump() {
   const bytes = (await stat(args.dump)).size;
   console.log(`Restoring ${args.dump} (${(bytes / (1024 * 1024)).toFixed(1)} MB) into the scratch database...`);
 
+  // Three phases, because the dump's foreign keys point at auth.users — a table
+  // Supabase owns and this dump deliberately does not carry. Schema and data
+  // first, then the owner ids get seeded into whatever auth.users stub exists,
+  // then the constraints and policies go on. Doing it this way turns an
+  // unavoidable pile of "ignored errors" into an extra proof: if a single
+  // owner_id were missing or corrupted, the foreign keys would refuse to build.
+  const prePost = runRestore(["--clean", "--if-exists", "--section=pre-data", "--section=data"], "schema + data");
+  await seedAuthUsers();
+  const post = runRestore(["--section=post-data"], "constraints, indexes, policies");
+
+  record(
+    "pg_restore completed without errors",
+    prePost.status === 0 && post.status === 0,
+    `schema+data exit ${prePost.status}, post-data exit ${post.status}`,
+  );
+}
+
+function runRestore(extraArgs, label) {
   const result = spawnSync(
     "pg_restore",
-    ["--clean", "--if-exists", "--no-owner", "--no-privileges", "--dbname", targetUrl, args.dump],
+    ["--no-owner", "--no-privileges", ...extraArgs, "--dbname", targetUrl, args.dump],
     { encoding: "utf8" },
   );
 
@@ -74,13 +92,42 @@ async function restoreDump() {
     fail(`pg_restore could not run (${result.error.message}). Install the PostgreSQL client tools.`);
   }
 
-  // pg_restore warns about objects it cannot drop on a fresh database; those are
-  // noise, and the verification below is what decides whether the restore worked.
-  if (result.stderr?.trim()) {
-    console.log(indent(result.stderr.trim().split("\n").slice(-10).join("\n")));
+  const errors = (result.stderr ?? "").split("\n").filter((line) => line.includes("pg_restore: error:"));
+  console.log(`  ${label}: exit ${result.status}${errors.length > 0 ? `, ${errors.length} error line(s)` : ""}`);
+
+  if (errors.length > 0) {
+    console.log(indent(errors.slice(0, 8).join("\n")));
   }
 
-  record("pg_restore exit code", result.status === 0, `exit ${result.status}`);
+  return result;
+}
+
+// The target may be a bare Postgres with a stub auth.users (the drill's own CI
+// container) or a real Supabase project. Both are fine: seeding is best-effort
+// and never invents a row that already exists.
+async function seedAuthUsers() {
+  const client = new pg.Client({ connectionString: targetUrl });
+  await client.connect();
+
+  try {
+    const { rows } = await client.query(`
+      select distinct owner_id from (
+        select owner_id from public.trees
+        union select owner_id from public.capture_submissions
+        union select owner_id from public.tree_target_states
+      ) owners where owner_id is not null
+    `);
+
+    for (const row of rows) {
+      await client.query("insert into auth.users (id) values ($1) on conflict do nothing", [row.owner_id]);
+    }
+
+    record("owner ids seeded into auth.users", true, `${rows.length} distinct owner(s)`);
+  } catch (error) {
+    record("owner ids seeded into auth.users", false, `${error.message} — the foreign keys below will fail without this`);
+  } finally {
+    await client.end();
+  }
 }
 
 async function verifyDatabase() {

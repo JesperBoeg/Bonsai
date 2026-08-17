@@ -100,16 +100,23 @@ jobs:
           PGPASSWORD: drill
         run: |
           set -euo pipefail
-          # Two things the dump needs from a vanilla Postgres:
+          # Three things the dump needs from a vanilla Postgres:
           #   - pgvector, because the photo tables declare vector(768) columns;
           #   - Supabase's roles, because RLS policies name them ("to authenticated")
           #     and policies are schema, not privileges — so pg_dump keeps them even
-          #     with --no-privileges, and every policy fails without the role.
+          #     with --no-privileges, and every policy fails without the role;
+          #   - stubs for the auth objects the policies and foreign keys reference
+          #     (auth.uid(), auth.users). The drill seeds auth.users from the restored
+          #     owner ids, so the foreign keys have to build for the drill to pass.
           # Stub roles are enough: the drill is about the data coming back, not about
           # reproducing Supabase's permission model. Re-running is safe; psql without
           # ON_ERROR_STOP reports "already exists" and carries on.
           cat > roles.sql <<'SQL'
           create extension if not exists vector;
+          create schema if not exists auth;
+          create table if not exists auth.users (id uuid primary key);
+          create or replace function auth.uid() returns uuid language sql stable as 'select null::uuid';
+          create or replace function auth.role() returns text language sql stable as 'select null::text';
           create role anon nologin;
           create role authenticated nologin;
           create role service_role nologin;
