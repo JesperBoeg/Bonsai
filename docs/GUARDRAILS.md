@@ -9,7 +9,7 @@ three of them are GitHub Actions in this repo.
 |---|---|---|---|
 | 1 | Keep-alive | 7-day-idle project pause | [`.github/workflows/keep-alive.yml`](../.github/workflows/keep-alive.yml) |
 | 2 | DIY backups | no managed backups on free | [`.github/workflows/nightly-backup.yml`](../.github/workflows/nightly-backup.yml) |
-| 3 | Custom SMTP | default sender caps auth email at ~2/hour | Supabase dashboard (owner, one-time) |
+| 3 | Custom SMTP | default sender caps auth email at ~2/hour | Brevo relay, configured in Supabase auth (done 2026-08-17) |
 | 4 | Storage watermark | 1 GB storage ceiling arrives unannounced | same nightly-backup workflow |
 
 Plus a fifth thing that is not a cron but is part of the same promise: the
@@ -82,14 +82,23 @@ on any plan. Sign-up confirmation is part of onboarding, so that limit is a
 product blocker, not an inconvenience. Custom SMTP is supported on the free plan
 and raises it to a configurable 30+/hour.
 
-1. Create a free account at [Resend](https://resend.com) (3,000 emails/month) or
-   [Brevo](https://www.brevo.com) (300/day) and verify a sender domain or address.
-2. Create an SMTP credential. Resend: host `smtp.resend.com`, port `465`,
-   username `resend`, password = the API key.
-3. Supabase dashboard → **Authentication → Emails → SMTP Settings**: enable custom
-   SMTP, fill in host/port/username/password, set the sender name and address to
-   the verified sender.
-4. Raise **Authentication → Rate limits → Emails per hour** to 30 or more.
+**In place since 2026-08-17: Brevo.** `smtp-relay.brevo.com:587`, login
+`b5ce77001@smtp-brevo.com`, sender `Bonsai <agileupgrade@gmail.com>`, and
+`rate_limit_email_sent` raised from 2 to **30/hour**. Brevo's free tier allows 300
+emails/day. The SMTP key lives only in Supabase's auth config — rotate it in
+Brevo (**SMTP & API → SMTP**) and re-apply if it ever leaks.
+
+Brevo was chosen over Resend for one reason: it verifies a single *sender address*
+by email, so it needs no DNS records. The cost is deliverability — mail sent as a
+Gmail address without domain authentication lands in spam more often. If that
+starts to matter, register a domain, verify it with Brevo (or Resend), and change
+the sender; nothing else about the setup changes.
+
+To reconfigure, either use the dashboard (**Authentication → Emails → SMTP
+Settings** and **Authentication → Rate Limits**) or `PATCH
+/v1/projects/<ref>/config/auth` with `smtp_host`, `smtp_port` (**as a string** —
+the API rejects a number), `smtp_user`, `smtp_pass`, `smtp_admin_email`,
+`smtp_sender_name`, `rate_limit_email_sent`.
 5. URL configuration — **already done (2026-08-17)**, and it was wrong before:
    Site URL was still `http://localhost:3000`, so every production confirmation
    link pointed at a machine that is not the app. It is now
@@ -98,16 +107,19 @@ and raises it to a configurable 30+/hour.
    the code for a session), with the allow-list covering
    `https://bonsai-progress.fly.dev/**` plus localhost ports 3000 and 3100 for
    development.
-6. Verify: sign up a throwaway address in production, confirm the email arrives
-   from your sender, and click through to a signed-in session.
+**Verified end to end on 2026-08-17**: Brevo authenticated and accepted the sender
+in a live `MAIL FROM`/`RCPT TO` probe; a production sign-up was accepted with no
+send error and GoTrue recorded `confirmation_sent_at` 30 ms later; the email was
+delivered and its link clicked (`email_confirmed_at` 16:50:58Z, ~3.5 minutes after
+sign-up); the confirmed account then signed in and reached the capture flow. The
+throwaway account was deleted afterwards.
 
-Status: **not configured yet** — until it is, production sign-ups are capped at
-about two per hour, and `rate_limit_email_sent` stays at 2. What has been verified
-without SMTP: a sign-up through the production UI is accepted, the confirmation
-link resolves to the production callback (no longer localhost), the account ends up
-confirmed, and it can sign in and see its own empty collection. The one leg that
-needs a real delivered email is the click-through auto-sign-in, because only a real
-signup mail carries the PKCE `?code=` that `/auth/callback` exchanges.
+One behaviour worth knowing rather than fixing: the confirmation link carries a
+PKCE `?code=`, and `/auth/callback` can only exchange it in the browser that
+signed up (the verifier lives in a cookie there). Sign up and click on the same
+device → straight into the app. Click on a different device → the account is
+confirmed and the user signs in with their password. Both paths work; only the
+first is a single click.
 
 ## 4. Storage watermark (part of the nightly backup)
 

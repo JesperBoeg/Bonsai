@@ -1,6 +1,6 @@
 # Bonsai — Future-State Plan
 
-Status: **Stage A complete and live in production at https://bonsai-progress.fly.dev** (Fly.io, ams; push-to-main auto-deploys). A1 (guardrails), A2 (Storage migration), A3 (container deploy), A4 (production smoke test **including the redeploy-persistence proof**) and C1 (Studio sweeper) are done and validated. A1 is complete: the backup secrets are set, the nightly backup has produced a verified artifact, and the restore drill passed 12/12. What remains is an SMTP account (A1's last quarter), `VOYAGE_API_KEY` (B1 gate → B2/B3), and rotating the Anthropic key.
+Status: **Stage A complete and live in production at https://bonsai-progress.fly.dev** (Fly.io, ams; push-to-main auto-deploys). A1 (guardrails), A2 (Storage migration), A3 (container deploy), A4 (production smoke test **including the redeploy-persistence proof**) and C1 (Studio sweeper) are done and validated. **Stage A is fully done, guardrails included**: backup secrets set, a verified backup artifact, the restore drill passed 12/12, and custom SMTP live on Brevo with onboarding verified end to end (delivered email, clicked link, confirmed account, sign-in). What remains is `VOYAGE_API_KEY` (B1 gate → B2/B3) and rotating the Anthropic key.
 Last updated: 2026-08-17
 Companion docs: [architecture.md](architecture.md) (original recognition design), [DEPLOY.md](DEPLOY.md) (Fly deploy runbook), [GUARDRAILS.md](GUARDRAILS.md) (the four free-plan guardrails and their secrets), the review/implementation report artifact (claude.ai artifact "Bonsai — App Review & AI Roadmap").
 
@@ -115,9 +115,9 @@ Scripts-only credentials (never in the app container): `SUPABASE_SERVICE_ROLE_KE
 
 **Validated already** (local app instance driving the *live* Supabase project, Playwright + screenshot review, 2026-08-17): sign-in, capture → live Claude suggestion → tree creation, photo served from the Storage CDN, Studio design + render persisted to Storage and rendered back, tree delete removing every object, and the statelessness proof in its strongest form — the app process was restarted **and** the user's on-disk photo directory renamed away, after which every collection thumbnail, tree photo and Studio render still loaded.
 
-**A4 — passed in production** (2026-08-17, after the deploy): `/api/health` healthy, sign-in, capture → live Claude species suggestion → tree creation, the photo served through a Supabase signed URL, the capture landing in the bucket, and a Studio design reaching `ready` with its plan persisted (no render — production runs `BONSAI_IMAGE_PROVIDER=none`). Then the **redeploy-persistence proof**: a second deploy replaced the machine, after which every collection thumbnail, the pre-redeploy capture and the Studio design still loaded, still via signed Storage URLs, with no design left stuck in progress. Deleting the smoke-test tree removed its objects from the bucket. 9 + 5 + 4 checks, screenshots reviewed.
+**A4 — passed in production** (2026-08-17, after the deploy; the sign-up-over-SMTP leg passed later the same day once Brevo was live): `/api/health` healthy, sign-in, capture → live Claude species suggestion → tree creation, the photo served through a Supabase signed URL, the capture landing in the bucket, and a Studio design reaching `ready` with its plan persisted (no render — production runs `BONSAI_IMAGE_PROVIDER=none`). Then the **redeploy-persistence proof**: a second deploy replaced the machine, after which every collection thumbnail, the pre-redeploy capture and the Studio design still loaded, still via signed Storage URLs, with no design left stuck in progress. Deleting the smoke-test tree removed its objects from the bucket. 9 + 5 + 4 checks, screenshots reviewed.
 
-The one thing still owed here: **sign-up over custom SMTP**, which needs that account (§6).
+Nothing outstanding: sign-up over custom SMTP was verified once Brevo was configured — a production sign-up delivered its confirmation email, the link confirmed the account, and the account signed in.
 
 ---
 
@@ -163,7 +163,7 @@ Nothing here is built: migration 0007 and the matching relocation are gated on 4
 |---|---|---|
 | Keep-alive | `.github/workflows/keep-alive.yml`, daily 06:12 UTC: `GET /api/health` (which itself round-trips to Postgres and reports `database`) plus a direct REST `select` so the database sees traffic even if the container is down. Fails the run on either. | **done** — both steps executed successfully by hand; the health endpoint's `ok` / `degraded` / `?strict=1` 503 behaviour was verified against a reachable and an unreachable project |
 | DIY backups | `.github/workflows/nightly-backup.yml`, daily 02:37 UTC: `pg_dump --format=custom --schema=public` + a full copy of the bucket with a sha256 manifest (`scripts/backup-storage-bucket.mjs`), uploaded as one private artifact (30-day retention). Supabase-managed `auth`/`storage` schemas are excluded on purpose — re-uploading photos recreates their metadata rows. | **done and verified 2026-08-17** — secrets set, first run produced `bonsai-backup-20260817T152958Z` (75 KB dump + 4 objects), and the drill restored it. Two things the first real run taught: the runner puts PostgreSQL 16 ahead of the installed 17 client on PATH, and the session pooler (5432) is required because runners are IPv4-only |
-| Custom SMTP | Resend/Brevo free tier in Supabase auth settings (default sender = ~2 emails/hour, an onboarding-killer; custom SMTP → 30+/hour configurable) | **owner action** — step-by-step in [GUARDRAILS.md](GUARDRAILS.md) §3 |
+| Custom SMTP | **Brevo** relay in Supabase auth: `smtp-relay.brevo.com:587`, sender `Bonsai <agileupgrade@gmail.com>`, `rate_limit_email_sent` 2 → 30/hour. Brevo needs no DNS (single verified sender), at some cost in deliverability | **done and verified 2026-08-17** — sign-up → delivered email → clicked link → confirmed account → sign-in |
 | Storage watermark | Same nightly job measures the bucket and, past 800 MB (`STORAGE_WATERMARK_MB`), opens or comments on a GitHub issue titled "Storage watermark passed — plan the Supabase Pro upgrade" | **done** — the first run measured 0.7 MB and correctly skipped the alert |
 | Restore drill | `.github/workflows/restore-drill.yml` — phased restore into a throwaway `pgvector/pgvector:pg17` container, asserting tables, RPC, 244 species with no ID drift, no orphan photos, every storage hash, and that all foreign keys rebuild | **passed 2026-08-17, 12/12** |
 
@@ -182,7 +182,7 @@ Nothing here is built: migration 0007 and the matching relocation are gated on 4
 | Step | State | Blocked on |
 |---|---|---|
 | A1 Guardrail crons (keep-alive, backups, watermark) | **done and verified** — three workflows + `/api/health`; secrets set, backup artifact produced, drill passed | — |
-| A1b Custom SMTP | not started (dashboard-only work) | Resend/Brevo account (owner) |
+| A1b Custom SMTP | **done and verified** — Brevo relay, 30 emails/hour | — |
 | A2 Storage migration code + migration script | **done and validated** against the live project | — |
 | A3 Container deploy + deploy Action | **done** — Fly app `bonsai-progress` (ams, 512 MB, single machine), `fly.toml`, deploy Action on `main`, `ANTHROPIC_API_KEY` secret set | — |
 | A4 Production smoke test incl. redeploy-persistence proof | **done** — passed after the deploy, machine replaced and every photo still loaded | sign-up-over-SMTP leg waits on the SMTP account |
@@ -199,7 +199,7 @@ Validation bar for every stage: the same as this whole effort — drive the real
 1. ~~Container host~~ — **resolved: Fly.io**, live in `ams`. The vision service is not hosted anywhere; capture degrades gracefully until Stage B resolves it.
 2. ~~Deploy Stage A2~~ — **shipped and verified in production** (commit "Ship Stage A of the future-state plan", CI and deploy green, A4 passed).
 3. ~~Backup secrets~~ — **set 2026-08-17**, backup verified, restore drill passed.
-4. **SMTP provider account** — the last quarter of A1, and the thing that currently caps sign-ups at ~2/hour. Brevo needs no DNS (verify a single sender address); Resend needs a domain you control.
+4. ~~SMTP provider account~~ — **done 2026-08-17**: Brevo relay live, 30 emails/hour, onboarding verified end to end. Optional follow-up: a real domain would improve deliverability (Gmail-sender mail without domain authentication is spam-prone).
 5. **`GEMINI_API_KEY`** (optional, any time) — turns Studio renders photoreal; the provider interface and `mock`/`none` fallbacks are already shipped.
 6. **`VOYAGE_API_KEY`** — needed to run B1, which gates all of Stage B.
 7. **Anthropic key rotation** and **revoking the Supabase Management access token** — the only key-hygiene items left; the Fly token and database password were rotated on 2026-08-17 ([checklist](GUARDRAILS.md#key-hygiene)).
