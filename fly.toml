@@ -32,10 +32,12 @@ primary_region = "ams"
   memory = "512mb"
 
 [checks]
+  # Liveness only: /api/health answers 200 with status "degraded" when Supabase is
+  # unreachable, so a database blip cannot pull the machine out of rotation.
   [checks.web]
     type = "http"
     port = 3000
-    path = "/sign-in"
+    path = "/api/health"
     interval = "30s"
     timeout = "5s"
     grace_period = "30s"

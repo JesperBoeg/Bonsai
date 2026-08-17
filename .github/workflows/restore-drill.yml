@@ -1,0 +1,99 @@
+name: Restore drill
+
+# Proves the nightly backup can come back (docs/GUARDRAILS.md). Manual only:
+# run it after the first successful nightly backup, and again whenever the schema
+# changes materially. It restores into a throwaway Postgres service container —
+# nothing production-facing is touched.
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "nightly-backup run to restore (blank = latest successful run)"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  drill:
+    name: Restore the latest backup into a scratch database
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        # pgvector image, not plain postgres: the dump has vector(768) columns.
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_PASSWORD: drill
+          POSTGRES_DB: drill
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install PostgreSQL client 17
+        run: |
+          set -euo pipefail
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client-17
+          pg_restore --version
+
+      - name: Download the backup artifact
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RUN_ID: ${{ inputs.run_id }}
+        run: |
+          set -euo pipefail
+          if [ -z "${RUN_ID:-}" ]; then
+            RUN_ID=$(gh run list --workflow nightly-backup.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+          fi
+          if [ -z "${RUN_ID:-}" ]; then
+            echo "::error::No successful nightly-backup run found. Run that workflow first."
+            exit 1
+          fi
+          echo "Restoring the backup from run $RUN_ID."
+          gh run download "$RUN_ID" --dir restore
+          find restore -maxdepth 3 -name '*.dump' -o -maxdepth 3 -name manifest.json | sort
+
+      - name: Enable pgvector in the scratch database
+        env:
+          PGPASSWORD: drill
+        run: |
+          set -euo pipefail
+          # The dump's vector columns need the extension; the postgres:17 image
+          # ships pgvector as of 17, and the drill fails loudly here if it does not.
+          psql -h localhost -U postgres -d drill -c "create extension if not exists vector" \
+            || echo "::warning::pgvector unavailable — vector columns will be reported by the drill."
+
+      - name: Restore and verify
+        env:
+          RESTORE_TARGET_DB_URL: postgres://postgres:drill@localhost:5432/drill
+        run: |
+          set -euo pipefail
+          dump=$(find restore -name '*.dump' | head -n1)
+          storage=$(dirname "$(find restore -name manifest.json | head -n1)")
+          node scripts/restore-drill.mjs --dump "$dump" --storage "$storage"

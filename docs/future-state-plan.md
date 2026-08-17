@@ -1,8 +1,8 @@
 # Bonsai — Future-State Plan
 
-Status: **in execution — production is live at https://bonsai-progress.fly.dev** (Fly.io, ams; push-to-main auto-deploys). Stage A3 (container deploy) completed ahead of A2; the pre-Stage-A caveat applies: photo bytes are on the machine's ephemeral disk until the Storage migration lands, so photos do not survive redeploys yet.
+Status: **Stage A code complete and validated; production is live at https://bonsai-progress.fly.dev** (Fly.io, ams; push-to-main auto-deploys). A1 (guardrails), A2 (Storage migration), A3 (container deploy) and C1 (Studio sweeper) are implemented and validated end-to-end against the live Supabase project from a local app instance. What is left is owner-gated, not code-gated: deploy A2 to production and re-run the smoke test (A4), an SMTP account (A1's last quarter), `VOYAGE_API_KEY` (B1 gate → B2/B3), and one restore drill run (C2).
 Last updated: 2026-08-17
-Companion docs: [architecture.md](architecture.md) (original recognition design), [DEPLOY.md](DEPLOY.md) (current Render-based deploy), the review/implementation report artifact (claude.ai artifact "Bonsai — App Review & AI Roadmap").
+Companion docs: [architecture.md](architecture.md) (original recognition design), [DEPLOY.md](DEPLOY.md) (Fly deploy runbook), [GUARDRAILS.md](GUARDRAILS.md) (the four free-plan guardrails and their secrets), the review/implementation report artifact (claude.ai artifact "Bonsai — App Review & AI Roadmap").
 
 This document is the single source of truth for where the product's infrastructure and AI architecture are going, why, and in what order. It captures the full plan agreed on 2026-08-16/17, including every constraint and correction surfaced during review.
 
@@ -10,21 +10,23 @@ This document is the single source of truth for where the product's infrastructu
 
 ## 1. Where we are today (validated baseline)
 
-Everything below is implemented on `main`, CI-green, and was validated visually end-to-end (Playwright drives with screenshot review) — first in local mode, then against the live Supabase project.
+Everything below is implemented and CI-green, and was validated visually end-to-end (Playwright drives, screenshots reviewed) — in local mode and against the live Supabase project. The Stage A/C work described here is in the repository; §7 records what has shipped to production and what has not.
 
 | Area | State |
 |---|---|
 | Core loops (capture → identify → confirm → timeline) | Working. The automatic identity match, photo serving, and full-catalog tree creation were all broken before 2026-08-15; all fixed and validated. |
 | Persistence | One authoritative `CollectionStore` per deployment: `supabase` (Postgres, owner-scoped queries + RLS) or `local` (file-backed, zero dependencies). Selected via `BONSAI_DATA_BACKEND`. |
-| Photo bytes | **Still on app-server disk** (`data/users/<uid>/uploads/`) in both modes. This is what Stage A removes for supabase mode. |
+| Photo bytes | **In Supabase Storage** (`bonsai-photos`, keyed `<uid>/captures/…`, `<uid>/studio/…`) in supabase mode; still on disk in local mode, by design. Served as short-lived signed URLs through `/api/photos/*`. Stage A2 — done and validated. |
 | Database | Hosted Supabase project `epqxygxvvlsobbyhhnke` (Frankfurt), migrations 0001–0006 applied. 244 species with pinned stable IDs, capture-submission wizard columns, `tree_target_states`, `allocate_tree_sequence()` RPC. Zero ID drift verified. |
 | AI recognition | Claude (`claude-opus-5`, structured outputs, server-side fallbacks) suggests species + style per capture; falls back to the Python vision service's leaf index when Claude is unavailable or errors (fallback proven live during a billing outage). |
 | AI Design Studio | Two-stage pipeline live: Claude designs (assessment, staged seasonal plan, constrained photo-edit instruction) → image provider renders (`gemini` implemented, `mock` for dev, `none`). Validated live end-to-end incl. persistence to `tree_target_states`. |
-| Identity matching | Python vision service (FastAPI + DINOv2 CPU), per-embedding-model candidate scoring (legacy `pixel-rgb-16` embeddings coexist with `dinov2-base-pooler`). |
-| Deploy story | Render Blueprint config (`render.yaml`) exists but **no Render services were ever provisioned**. CI is a lint/build/test quality gate on `main`. This plan supersedes the Render setup. |
+| Identity matching | Python vision service (FastAPI + DINOv2 CPU), per-embedding-model candidate scoring (legacy `pixel-rgb-16` embeddings coexist with `dinov2-base-pooler`). **Not deployed** — `VISION_SERVICE_URL` is unset in production, so automatic identity matching is off and users pick the tree manually; everything else degrades gracefully. |
+| Deploy story | **Fly.io** — app `bonsai-progress` (ams, one 512 MB machine), `fly.toml` + a deploy Action on `main`. `render.yaml` deleted; `DEPLOY.md` and `.github/DEPLOYMENT.md` rewritten to the Fly shape. CI is a lint/build/test quality gate on `main`. |
+| Guardrail crons | Keep-alive, nightly backup (`pg_dump` + bucket copy as a private artifact), storage watermark → GitHub issue, and a manual restore drill. `/api/health` reports app + database state. Secrets still owed for the backup job. |
+| Robustness | Studio designs interrupted by a restart are swept to `failed` after 10 minutes with a "Design again" retry, instead of spinning forever (Stage C1 — done and validated). |
 | PWA | Installable: icons, manifest, service worker (production-only registration), offline page. |
 
-**Fixed costs today: $0** (nothing hosted; app runs locally). Supabase is on the free plan.
+**Fixed costs today: ~$3/mo** (one Fly machine). Supabase is on the free plan; the vision service is not hosted.
 
 Credentials note (2026-08-15/16): an Anthropic API key and a Supabase access token were shared in chat during setup. The token was single-purpose (migrations) and should be revoked; the API key should be rotated and lives only in gitignored `.env.local` / host env.
 
@@ -36,7 +38,7 @@ One managed backbone for all state, one tiny stateless container for compute, AP
 
 ```mermaid
 flowchart LR
-    U["Browser / PWA"] --> W["Web app container\nNext.js, ~512 MB, stateless\nFly.io or Hetzner"]
+    U["Browser / PWA"] --> W["Web app container\nNext.js, 512 MB, stateless\nFly.io ams (live)"]
     U -->|"signed URLs (CDN)"| ST
     W --> SB["Supabase (Frankfurt)\nPostgres + pgvector · Auth"]
     W --> ST["Supabase Storage\nbonsai-photos bucket"]
@@ -72,23 +74,25 @@ The marginal-cost shape maps directly onto the intended freemium model (free tie
 
 **Goal:** no photo byte ever depends on a container's disk again (in supabase mode); deploy the app as a stateless container with a live public URL.
 
-### 3.1 Storage migration scope
+### 3.1 Storage migration scope — **done**
 
-The `bonsai-photos` bucket already exists (migration 0001) with owner-scoped RLS: objects must live under `<auth.uid()>/...` (first path folder = owner id). Touchpoints, all inside `SupabaseCollectionStore` + `lib/storage-paths.ts`:
+The `bonsai-photos` bucket already existed (migration 0001) with owner-scoped RLS: objects must live under `<auth.uid()>/...` (first path folder = owner id). Everything below is implemented behind one façade, `apps/web/lib/photo-storage.ts`, which dispatches on the data backend so no caller knows which side it is writing to:
 
-1. **Path convention change:** storage keys become `<uid>/captures/<submissionId>-front.jpg`, `<uid>/captures/<submissionId>-leaf.png`, `<uid>/studio/<targetId>.png`. The DB `storage_path` values keep their current relative form (`captures/...`, `studio/...`); the storage layer prefixes the owner id.
-2. **Uploads:** capture front/leaf writes and Studio render writes go to `supabase.storage.from("bonsai-photos").upload(...)` (server-side, service uses the user's session → RLS-scoped).
-3. **Serving:** `/api/photos/[...segments]` resolves via short-lived signed URLs (redirect, CDN-cached) with the existing `private, max-age, immutable` semantics; fall back to streaming through the route if signed-URL redirects interact badly with the service worker. Local mode keeps disk + streaming unchanged.
-4. **AI reads:** Claude/Voyage/Gemini inputs download bytes server-side from Storage instead of `readPhotoFile`.
-5. **Deletes:** `deleteTree` calls `storage.remove()` for all collected paths (photos, leaf files, studio renders).
-6. **One-time migration script** (`scripts/migrate-photos-to-storage.mjs`): uploads every existing disk file for each user to the bucket, verifies by download-hash, idempotent (skip-if-exists). Run once per environment; legacy disk files kept until verified, then removable.
-7. **Local mode unaffected** — disk remains the local backend's storage; that is its purpose.
+1. **Path convention** ✅ — storage keys are `<uid>/captures/<submissionId>-front.jpg`, `<uid>/captures/<submissionId>-leaf.png`, `<uid>/studio/<targetId>.<ext>`. The DB `storage_path` values keep their owner-free relative form (`captures/...`, `studio/...`); the storage layer prefixes the owner id. Verified against the live project: rows hold `captures/…`, objects are owner-prefixed.
+2. **Uploads** ✅ — capture front/leaf writes and Studio render writes go through `supabase.storage.from("bonsai-photos").upload(...)` using the user's session, so RLS scopes every write.
+3. **Serving** ✅ — `/api/photos/[...segments]` authenticates the viewer, then 307-redirects to a 1-hour signed URL; the redirect is cached for 30 minutes (always less than the signature's life). Supabase serves signed URLs with an `expires` header matching the signature, so a client re-fetches at most hourly — the `private, max-age=31536000, immutable` headers still apply to streamed responses, and objects are stored with a one-year cache lifetime. `BONSAI_PHOTO_SERVING=stream` is the documented fallback (same URLs, bytes proxied through the app); both modes were validated to return byte-identical images. The service worker never caches `/api/*`, so signed redirects and it do not interact at all.
+4. **AI reads** ✅ — the Studio pipeline (Claude design input, Gemini render input, historical trajectory photos) downloads bytes from Storage. Capture-time Claude calls already worked from the in-memory upload, never from disk.
+5. **Deletes** ✅ — `deleteTree` collects photo, leaf and Studio-render paths and calls `storage.remove()`; a Storage failure is logged, never surfaced as a failed delete. Validated: all three objects of a deleted tree disappeared from the bucket.
+6. **One-time migration script** ✅ — `scripts/migrate-photos-to-storage.mjs`: uploads every disk file per user, verifies each upload by downloading it back and comparing sha256, skips objects already present with a matching hash, and never deletes anything on disk. `--dry-run`, `--user`, `--legacy-owner` flags. Runs with a service-role key, or with a single user's JWT (RLS-scoped) when the owner would rather not handle the service key. Proven against the live project: dry run → real run (3 files, hash-verified) → re-run (3 skipped).
+7. **Local mode unaffected** ✅ — the local backend still writes and streams from `<repo>/data`; regression-tested with a full capture in local mode (bytes on disk, `200` streamed responses, no redirects).
+
+> **Deploy-day note, and the last proof that this stage was needed.** Photos captured in production before this shipped lived on the Fly machine's ephemeral disk. An attempt to rescue the one such capture (a test tree from earlier the same day) through the live app returned **404 — the machine had already cycled and the bytes were gone**, while its database row survived. The orphaned test tree was deleted. For any future environment with photos on disk, run `scripts/migrate-photos-to-storage.mjs` *before* replacing the machine.
 
 ### 3.2 Hosting
 
-- **Primary choice: Fly.io**, `ams` or `fra` region, one machine `shared-cpu-1x` 512 MB (~$3.19/mo), no volume needed after 3.1. Deploy via `fly.toml` + GitHub Action on `main` (replacing Render autoDeploy).
-- **Alternative (owner preference): Hetzner CX22** (~€4.49/mo) with Docker Compose + Caddy (auto-TLS) + a deploy Action over SSH; also comfortably hosts the vision service during the Stage B transition, which Fly would price at ~$10.70/mo extra until retirement.
-- Note: until Stage B completes, the Python vision service still needs somewhere to run (2 GB RAM). Options during the interim: Hetzner box (covers both cheaply), Fly 2 GB machine with auto-stop (cold start 1–2 min, capture degrades gracefully), or accept degraded identity matching (manual tree pick) in production until Stage B. **Decision folded into the Fly-vs-Hetzner choice.**
+- **Chosen and live: Fly.io**, `ams`, one machine `shared-cpu-1x` 512 MB (~$3.19/mo), no volume. `fly.toml` + `.github/workflows/fly-deploy.yml` on `main`. Its health check now points at `/api/health` (liveness only — that route answers 200/"degraded" when Postgres is unreachable so a Supabase blip cannot pull the machine out of rotation).
+- **Rejected alternative: Hetzner CX22** (~€4.49/mo) with Docker Compose + Caddy (auto-TLS) + a deploy Action over SSH; also comfortably hosts the vision service during the Stage B transition, which Fly would price at ~$10.70/mo extra until retirement.
+- Note: until Stage B completes, the Python vision service still needs somewhere to run (2 GB RAM). Options during the interim: Hetzner box (covers both cheaply), Fly 2 GB machine with auto-stop (cold start 1–2 min, capture degrades gracefully), or accept degraded identity matching (manual tree pick) in production until Stage B. **Current state: the vision service is not deployed and `VISION_SERVICE_URL` is unset in production, so capture degrades gracefully — Claude still suggests species and style, and the user picks the tree manually.**
 
 ### 3.3 Environment variables (production container)
 
@@ -101,11 +105,16 @@ The `bonsai-photos` bucket already exists (migration 0001) with owner-scoped RLS
 | `GEMINI_API_KEY` | optional |
 | `VISION_SERVICE_URL` | interim vision host URL, or unset (graceful degradation) |
 | `VOYAGE_API_KEY` | Stage B |
+| `BONSAI_PHOTO_SERVING` | unset (signed-URL redirects). `stream` proxies photo bytes through the app instead |
 | `BONSAI_REPO_ROOT` | not needed in the container (marker discovery works); available as override |
+
+Scripts-only credentials (never in the app container): `SUPABASE_SERVICE_ROLE_KEY` (migration + backup), `SUPABASE_DB_URL` (backup), `RESTORE_TARGET_DB_URL` (restore drill), `VOYAGE_API_KEY` (B1 benchmark). See [GUARDRAILS.md](GUARDRAILS.md).
 
 ### 3.4 Definition of done
 
-Production smoke test against the live URL: sign-in (via custom SMTP), capture → suggestion → tree creation, photo loads from Storage CDN, Studio design persisted, then **redeploy the container and verify every photo still loads** (the statelessness proof). Screenshot evidence, same method as all prior validation.
+**Validated already** (local app instance driving the *live* Supabase project, Playwright + screenshot review, 2026-08-17): sign-in, capture → live Claude suggestion → tree creation, photo served from the Storage CDN, Studio design + render persisted to Storage and rendered back, tree delete removing every object, and the statelessness proof in its strongest form — the app process was restarted **and** the user's on-disk photo directory renamed away, after which every collection thumbnail, tree photo and Studio render still loaded.
+
+**Still owed (A4):** the same pass against `https://bonsai-progress.fly.dev` after deploying, including a `fly deploy`/machine restart between two photo loads, and sign-up over custom SMTP once that account exists.
 
 ---
 
@@ -113,15 +122,19 @@ Production smoke test against the live URL: sign-in (via custom SMTP), capture �
 
 **Goal:** delete the 2 GB Python dependency from the architecture — after proving quality, not before.
 
-### 4.1 The benchmark gate (blocking)
+### 4.1 The benchmark gate (blocking — script ready, needs `VOYAGE_API_KEY`)
 
-Script `scripts/benchmark-voyage-reid.mjs`:
+`scripts/benchmark-voyage-reid.mjs` is written and waiting for the key. It scores both embedding spaces with the *same* ranking code (cosine over one gallery embedding per tree, the 55 catalog trees as distractors), prints a PASS/FAIL verdict, and exits 2 on a failed gate:
 - Embed the reference catalog (~55 captured tree images) and all real capture photos with both DINOv2 (via the running vision service) and `voyage-multimodal-3`.
 - Task: same-tree re-identification — for each duplicate/near-duplicate capture, does the true tree rank #1 (and within the current shortlist thresholds)?
 - Also spot-check the leaf-species index path (217 leaf references) since Voyage would take that over too.
 - **Cutover only if Voyage ≥ DINOv2 on top-1 and top-3.** Otherwise the Python service stays and this stage is shelved — the architecture still works, just at Hetzner-tier hosting cost.
+- Two honest caveats the script prints itself: the 0.94 auto-match threshold is DINOv2-space-specific and would need recalibrating (it is reported, never compared), and the leaf spot-check scores the vision service with the query patch present in its own index — optimistic for DINOv2, i.e. conservative in the direction that matters.
+- The re-ID set needs at least one tree with two or more photos. It is discovered from local-mode store documents by default; `--manifest` accepts your own labels.
 
-### 4.2 Schema and code changes (post-gate)
+### 4.2 Schema and code changes (post-gate — deliberately NOT implemented)
+
+Nothing here is built: migration 0007 and the matching relocation are gated on 4.1 passing, and shipping a 1024-dim column plus a JS matcher before the gate would be exactly the kind of speculative work this plan was written to avoid.
 
 - **Dimension mismatch (discovered in review):** existing columns are `vector(768)`; Voyage multimodal-3 outputs 1024-dim. Migration 0007 adds `embedding_v2 vector(1024)` (+ `embedding_model` already tracks provenance) on `photos` and `capture_submissions`; ivfflat index on the new column.
 - Matching moves out of the Python service: JS cosine over the candidate set in the web app initially (collections are ≤ hundreds of photos), switching to a pgvector `<=>` query once collections warrant it. The per-embedding-model scoring already in `lib/` means old-space and new-space candidates coexist during transition; a re-embed script converges the backlog.
@@ -132,10 +145,10 @@ Script `scripts/benchmark-voyage-reid.mjs`:
 
 ## 5. Stage C — robustness + cleanup
 
-1. **Studio stale-job sweeper (required for production trust):** in-process pipelines die with the process; a deploy mid-design leaves a target stuck at `analyzing`. Add: on Studio data load, mark in-progress targets older than 10 minutes as `failed` ("interrupted by a restart — design again"), and a retry button on the failed card.
-2. **Backups get restore-tested** once (see guardrails — a backup that's never been restored is a hope, not a backup).
-3. Deploy-config cleanup: remove/slim `render.yaml` to whatever survives, update `DEPLOY.md` + `.github/DEPLOYMENT.md` to the final shape, CI unchanged as quality gate.
-4. Key hygiene confirmation: chat-exposed Anthropic key rotated; Supabase access token revoked.
+1. **Studio stale-job sweeper** ✅ **done and validated.** On Studio data load *and* on every poll of `/api/studio/[targetId]`, any target in progress for more than 10 minutes that is not running in this process is marked `failed` with "This design was interrupted by a server restart. Design again to pick up from the current photos.", and the failed card carries a **Design again** button that re-runs the design with the original brief (and the previous plan's style/horizon when it got that far). Validated by planting a target stuck at `analyzing` 30 minutes old: the card replaced the spinner, the row flipped to `failed`, and the retry produced a new `ready` design that renders.
+2. **Backups get restore-tested** — the drill is automated but **not yet run**: `.github/workflows/restore-drill.yml` restores the newest backup artifact into a throwaway `pgvector/pgvector:pg17` container and `scripts/restore-drill.mjs` asserts tables, the `allocate_tree_sequence()` RPC, 244 species with no ID drift, no orphaned photo rows, and every storage object matching its manifest hash. It needs one successful nightly backup first (which needs the two secrets in [GUARDRAILS.md](GUARDRAILS.md)).
+3. Deploy-config cleanup ✅ **done** — `render.yaml` deleted, `DEPLOY.md` + `.github/DEPLOYMENT.md` + `README.md` rewritten to the Fly shape, `.env.example` extended, Dockerfile comment corrected (the `/app/data` directory is local-mode scratch space now, not a disk to mount). CI unchanged as the quality gate.
+4. Key hygiene confirmation — **owner action, still open**: rotate the chat-exposed Anthropic key, revoke the Supabase access token, rotate the Fly deploy token. Checklist with commands in [GUARDRAILS.md](GUARDRAILS.md#key-hygiene).
 
 ---
 
@@ -143,12 +156,12 @@ Script `scripts/benchmark-voyage-reid.mjs`:
 
 **Decision: launch early-adopter mode on the Supabase free plan.** The pause risk that killed the project in summer 2026 was an artifact of zero traffic, not a plan property. Four guardrails (all free, all GitHub Actions) make free viable:
 
-| Guardrail | Implementation |
-|---|---|
-| Keep-alive | Daily scheduled Action pings a health endpoint / runs `select 1` — pausing (7-day-idle) becomes impossible |
-| DIY backups | Nightly `pg_dump` + storage-bucket sync to a private, off-Supabase location; **one restore drill** to prove it |
-| Custom SMTP | Resend/Brevo free tier in Supabase auth settings (default sender = ~2 emails/hour, an onboarding-killer; custom SMTP → 30+/hour configurable) |
-| Storage watermark | Backup job alerts at 800 MB bucket usage so the Pro upgrade is planned, not forced |
+| Guardrail | Implementation | State |
+|---|---|---|
+| Keep-alive | `.github/workflows/keep-alive.yml`, daily 06:12 UTC: `GET /api/health` (which itself round-trips to Postgres and reports `database`) plus a direct REST `select` so the database sees traffic even if the container is down. Fails the run on either. | **done** — both steps executed successfully by hand; the health endpoint's `ok` / `degraded` / `?strict=1` 503 behaviour was verified against a reachable and an unreachable project |
+| DIY backups | `.github/workflows/nightly-backup.yml`, daily 02:37 UTC: `pg_dump --format=custom --schema=public` + a full copy of the bucket with a sha256 manifest (`scripts/backup-storage-bucket.mjs`), uploaded as one private artifact (30-day retention). Supabase-managed `auth`/`storage` schemas are excluded on purpose — re-uploading photos recreates their metadata rows. | **code done, needs secrets** — `SUPABASE_DB_URL` + `SUPABASE_SERVICE_ROLE_KEY`. The job fails loudly until they exist, because a silent no-op backup is worse than a red run |
+| Custom SMTP | Resend/Brevo free tier in Supabase auth settings (default sender = ~2 emails/hour, an onboarding-killer; custom SMTP → 30+/hour configurable) | **owner action** — step-by-step in [GUARDRAILS.md](GUARDRAILS.md) §3 |
+| Storage watermark | Same nightly job measures the bucket and, past 800 MB (`STORAGE_WATERMARK_MB`), opens or comments on a GitHub issue titled "Storage watermark passed — plan the Supabase Pro upgrade" | **done** (rides on the backup job's secrets) |
 
 **Free-plan ceilings to respect:** ~2,000–2,500 photos (1 GB at current ~400 KB client-side compression), 5 GB egress/month (~10k image views; immutable caching stretches this), 500 MB database (ample — embeddings are KBs), no managed backups (mitigated above).
 
@@ -162,27 +175,30 @@ Script `scripts/benchmark-voyage-reid.mjs`:
 
 ## 7. Execution order and effort
 
-| Step | Depends on | Size |
+| Step | State | Blocked on |
 |---|---|---|
-| A1 Guardrail crons (keep-alive, backups, SMTP, watermark) | SMTP account (owner) | small |
-| A2 Storage migration code + migration script | — | medium |
-| A3 Container deploy + deploy Action | ~~done~~ — Fly app `bonsai-progress` (ams, 512 MB, single machine), `fly.toml`, GitHub Action deploy on main, `ANTHROPIC_API_KEY` secret set, production smoke test passed | done |
-| A4 Production smoke test incl. redeploy-persistence proof | A2, A3 | small |
-| B1 Voyage benchmark | `VOYAGE_API_KEY` (owner) | small |
-| B2 Migration 0007 + matching relocation + re-embed + leaf index | B1 gate passed | medium |
-| B3 Vision service retirement | B2 validated | small |
-| C1 Studio sweeper + retry | — (can run parallel to A) | small |
-| C2 Restore drill, config cleanup, docs, key-hygiene check | A, B | small |
+| A1 Guardrail crons (keep-alive, backups, watermark) | **done** — three workflows + `/api/health` | backup job needs `SUPABASE_DB_URL` + `SUPABASE_SERVICE_ROLE_KEY` (owner) |
+| A1b Custom SMTP | not started (dashboard-only work) | Resend/Brevo account (owner) |
+| A2 Storage migration code + migration script | **done and validated** against the live project | — |
+| A3 Container deploy + deploy Action | **done** — Fly app `bonsai-progress` (ams, 512 MB, single machine), `fly.toml`, deploy Action on `main`, `ANTHROPIC_API_KEY` secret set | — |
+| A4 Production smoke test incl. redeploy-persistence proof | pending | deploying A2 (a push to `main` ships it) |
+| B1 Voyage benchmark | **script ready** | `VOYAGE_API_KEY` (owner) |
+| B2 Migration 0007 + matching relocation + re-embed + leaf index | intentionally not started | B1 gate passing |
+| B3 Vision service retirement | intentionally not started | B2 validated |
+| C1 Studio sweeper + retry | **done and validated** | — |
+| C2 Restore drill, config cleanup, docs, key-hygiene check | config + docs + drill automation **done**; drill unrun | one successful nightly backup; owner key rotation |
 
 Validation bar for every stage: the same as this whole effort — drive the real app, screenshot it, verify the rows/objects landed, never call it done on theory.
 
 ## Open decisions
 
-1. **Container host: Fly.io (~$3/mo, zero-ops, vision interim costs extra) vs Hetzner CX22 (~€4.5/mo, one box covers the vision interim too, light self-management).** Needed to start A3 — provide the matching API token.
-2. **SMTP provider account** (Resend or Brevo free tier) — needed for A1.
-3. **`GEMINI_API_KEY`** (optional, any time) — turns Studio renders photoreal.
-4. **`VOYAGE_API_KEY`** — needed to start B1.
-5. Confirm the Anthropic key rotation + Supabase token revocation happened.
+1. ~~Container host~~ — **resolved: Fly.io**, live in `ams`. The vision service is not hosted anywhere; capture degrades gracefully until Stage B resolves it.
+2. **Deploy Stage A2 to production** — a push to `main` auto-deploys and unblocks A4. Optionally run the migration script inside the current machine first to keep the handful of production photos that are on its ephemeral disk.
+3. **Backup secrets** — `SUPABASE_DB_URL` and `SUPABASE_SERVICE_ROLE_KEY` as repository secrets; without them the nightly backup fails by design.
+4. **SMTP provider account** (Resend or Brevo free tier) — the last quarter of A1, and the thing that currently caps sign-ups at ~2/hour.
+5. **`GEMINI_API_KEY`** (optional, any time) — turns Studio renders photoreal; the provider interface and `mock`/`none` fallbacks are already shipped.
+6. **`VOYAGE_API_KEY`** — needed to run B1, which gates all of Stage B.
+7. Confirm the Anthropic key rotation, Supabase access-token revocation, and Fly token rotation happened ([checklist](GUARDRAILS.md#key-hygiene)).
 
 ## Deferred by design (tracked, not planned)
 

@@ -10,7 +10,7 @@ import {
 } from "./catalog";
 import { isClaudeConfigured, suggestSpeciesAndStyle } from "./ai/claude";
 import { getSpeciesCareProfileBySlug, type SpeciesCareProfile } from "./species-care-profiles";
-import { deletePhotoFile, writePhotoFile } from "./storage-paths";
+import { deletePhotos, writePhoto } from "./photo-storage";
 import { getCollectionStore } from "./store";
 import type {
   CandidateMatch,
@@ -475,9 +475,9 @@ export async function createLocalCaptureSubmission(input: CreateCaptureSubmissio
     ? new File([new Uint8Array(leafBuffer)], "leaf-capture", { type: input.leafPhoto.type })
     : null;
 
-  await writePhotoFile(viewer.id, frontStoragePath, frontBuffer);
+  await writePhoto(viewer.id, frontStoragePath, frontBuffer);
   if (leafStoragePath && leafBuffer) {
-    await writePhotoFile(viewer.id, leafStoragePath, leafBuffer);
+    await writePhoto(viewer.id, leafStoragePath, leafBuffer);
   }
 
   try {
@@ -595,10 +595,7 @@ export async function createLocalCaptureSubmission(input: CreateCaptureSubmissio
     await store.createSubmission(viewer, submission);
     return { id: submissionId };
   } catch (error) {
-    await deletePhotoFile(viewer.id, frontStoragePath);
-    if (leafStoragePath) {
-      await deletePhotoFile(viewer.id, leafStoragePath);
-    }
+    await deletePhotos(viewer.id, leafStoragePath ? [frontStoragePath, leafStoragePath] : [frontStoragePath]);
     throw error;
   }
 }
@@ -728,7 +725,9 @@ export async function deleteTree(treeId: string): Promise<void> {
   const store = getCollectionStore();
   const storagePaths = await store.deleteTree(viewer, treeId);
 
-  await Promise.all(storagePaths.map((storagePath) => deletePhotoFile(viewer.id, storagePath)));
+  // Photos, leaf files, and Studio renders all come back from the store; remove
+  // every byte so a deleted tree leaves nothing behind in Storage or on disk.
+  await deletePhotos(viewer.id, storagePaths);
 }
 
 export function resolvePhotoPathFromSegments(segments: string[]) {

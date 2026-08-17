@@ -17,7 +17,10 @@ COPY apps/web ./apps/web
 WORKDIR /app/apps/web
 RUN npm run build
 
-# The local data store lives at <repo-root>/data — mount a persistent disk here.
+# In supabase mode nothing durable lives here — photo bytes are in Supabase
+# Storage, which is what makes the container disposable. The directory exists only
+# so a container started in local mode (BONSAI_DATA_BACKEND=local) has somewhere
+# to write; that data does NOT survive a redeploy and is not meant to.
 RUN mkdir -p /app/data
 
 # NODE_ENV is set after `npm ci` on purpose: setting it earlier would make npm

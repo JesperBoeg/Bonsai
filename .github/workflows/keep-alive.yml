@@ -1,0 +1,49 @@
+name: Keep-alive
+
+# Guardrail 1 of 4 for running on the Supabase free plan (docs/GUARDRAILS.md).
+#
+# The free plan pauses a project after 7 days without activity — that is what
+# killed this project once already. This job touches both the app and Postgres
+# every day, so the idle timer never gets close to expiring. It also fails loudly
+# when either is unreachable, which makes it a cheap uptime check.
+
+on:
+  schedule:
+    # 06:12 UTC daily — off the hour to avoid the scheduler's busiest minute.
+    - cron: "12 6 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: keep-alive
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    name: Ping app and database
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping the app health endpoint
+        env:
+          APP_URL: ${{ vars.APP_URL || 'https://bonsai-progress.fly.dev' }}
+        run: |
+          set -euo pipefail
+          echo "GET $APP_URL/api/health"
+          body=$(curl --fail --silent --show-error --max-time 30 --retry 3 --retry-delay 10 "$APP_URL/api/health")
+          echo "$body"
+          echo "$body" | jq -e '.status == "ok"' > /dev/null
+          echo "$body" | jq -e '.database == "ok"' > /dev/null
+
+      - name: Run a select against Postgres
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL || 'https://epqxygxvvlsobbyhhnke.supabase.co' }}
+          # Publishable/anon key — safe in CI, already public in the client bundle.
+          SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_REgFRCS_t7Rmf_s0uxx4KA_-KOIDNpf' }}
+        run: |
+          set -euo pipefail
+          # Independent of the app: even if the container is down, the database
+          # still sees traffic today.
+          curl --fail --silent --show-error --max-time 30 --retry 3 --retry-delay 10 \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            "$SUPABASE_URL/rest/v1/species?select=id&limit=1" > /dev/null
+          echo "Postgres answered."

@@ -2,7 +2,7 @@ import type { Route } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { StudioLab } from "../../../components/studio-lab";
-import { createTargetStateAction, updateTreePlanAction } from "../actions";
+import { createTargetStateAction, retryTargetStateAction, updateTreePlanAction } from "../actions";
 import { getRequiredViewer } from "../../../lib/auth";
 import { formatDisplayDate, getTreeDetail } from "../../../lib/bonsai";
 import { getStudioData } from "../../../lib/studio";
@@ -121,6 +121,7 @@ export default async function TreePage({ params, searchParams }: TreePageProps) 
           developmentPlan={tree.developmentPlan}
           focusTargetId={focusTargetId}
           renderProvider={studio.renderProvider}
+          retryTargetStateAction={retryTargetStateAction}
           styleCatalog={STYLE_OPTIONS}
           targets={studio.targets}
           treeId={tree.id}

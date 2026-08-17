@@ -1,0 +1,150 @@
+name: Nightly backup
+
+# Guardrails 2 and 4 of 4 for the Supabase free plan (docs/GUARDRAILS.md):
+#
+#   - DIY backups: the free plan has no managed backups, so this job takes a
+#     nightly `pg_dump` of the database and a full copy of the `bonsai-photos`
+#     bucket, and stores both as a private GitHub Actions artifact — off Supabase,
+#     visible only to people with repo access. Prove it works with the restore
+#     drill (scripts/restore-drill.mjs) at least once.
+#   - Storage watermark: the same run measures the bucket and opens a GitHub issue
+#     when it passes 800 MB, so the Pro upgrade is a planned decision instead of a
+#     forced one.
+#
+# Required secrets:
+#   SUPABASE_DB_URL             Postgres connection string (Project settings →
+#                               Database → Connection string → URI, session pooler,
+#                               password included)
+#   SUPABASE_SERVICE_ROLE_KEY   Project settings → API → service_role key
+# Optional variables:
+#   SUPABASE_URL                defaults to the current project URL
+#   BACKUP_RETENTION_DAYS       artifact retention (default 30)
+#   STORAGE_WATERMARK_MB        watermark in MB (default 800)
+
+on:
+  schedule:
+    # 02:37 UTC daily, before the keep-alive ping.
+    - cron: "37 2 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: nightly-backup
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  backup:
+    name: Dump database and storage
+    runs-on: ubuntu-latest
+    outputs:
+      watermark_exceeded: ${{ steps.storage.outputs.watermark_exceeded }}
+      total_bytes: ${{ steps.storage.outputs.total_bytes }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify required secrets are present
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          missing=""
+          [ -n "$SUPABASE_DB_URL" ] || missing="$missing SUPABASE_DB_URL"
+          [ -n "$SUPABASE_SERVICE_ROLE_KEY" ] || missing="$missing SUPABASE_SERVICE_ROLE_KEY"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secret(s):$missing — see docs/GUARDRAILS.md. Until they are set there is no backup."
+            exit 1
+          fi
+
+      - name: Install PostgreSQL client 17
+        run: |
+          set -euo pipefail
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client-17
+          pg_dump --version
+
+      - name: Dump the database
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          mkdir -p backup
+          stamp=$(date -u +%Y%m%dT%H%M%SZ)
+          echo "STAMP=$stamp" >> "$GITHUB_ENV"
+          # `public` holds everything the app owns. Roles, tablespaces, and the
+          # `storage`/`auth` schemas are Supabase-managed: the photo bytes are
+          # backed up separately below, and re-uploading them through the storage
+          # API recreates their metadata rows.
+          pg_dump "$SUPABASE_DB_URL" \
+            --no-owner --no-privileges --no-tablespaces \
+            --schema=public \
+            --format=custom \
+            --file="backup/bonsai-db-$stamp.dump"
+          ls -lh backup
+
+      - name: Back up the storage bucket
+        id: storage
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL || 'https://epqxygxvvlsobbyhhnke.supabase.co' }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          node scripts/backup-storage-bucket.mjs \
+            --out backup/storage \
+            --watermark "${{ vars.STORAGE_WATERMARK_MB || '800' }}"
+
+      - name: Upload the backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bonsai-backup-${{ env.STAMP }}
+          path: backup
+          retention-days: ${{ vars.BACKUP_RETENTION_DAYS || 30 }}
+          if-no-files-found: error
+
+  watermark-alert:
+    name: Storage watermark alert
+    needs: backup
+    if: needs.backup.outputs.watermark_exceeded == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Open or update the upgrade-trigger issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TOTAL_BYTES: ${{ needs.backup.outputs.total_bytes }}
+        run: |
+          set -euo pipefail
+          title="Storage watermark passed — plan the Supabase Pro upgrade"
+          megabytes=$(( TOTAL_BYTES / 1048576 ))
+          body=$(printf '%s\n' \
+            "The \`bonsai-photos\` bucket is at ${megabytes} MB, past the 800 MB watermark." \
+            "" \
+            "Per docs/future-state-plan.md §6 this is an upgrade trigger: the free plan caps storage at 1 GB." \
+            "Options: upgrade to Supabase Pro (\$25/mo, 100 GB) or prune/offload photos." \
+            "" \
+            "_Opened automatically by the nightly-backup workflow._")
+          existing=$(gh issue list --state open --search "$title in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi

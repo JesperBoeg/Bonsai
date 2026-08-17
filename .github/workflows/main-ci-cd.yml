@@ -1,8 +1,7 @@
 name: CI
 
-# Quality gate only. Deployment is handled by Render: both services in
-# render.yaml have autoDeploy enabled, so Render builds and deploys the
-# containers on every push to main. This workflow just has to stay green.
+# Quality gate only. Deployment is a separate workflow (fly-deploy.yml), which
+# runs on every push to main whether or not this one is green — so keep it green.
 
 on:
   push:

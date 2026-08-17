@@ -47,6 +47,7 @@ type StudioLabProps = {
   styleCatalog: Array<{ id: number; label: string }>;
   developmentPlan: string | null;
   createTargetStateAction: (formData: FormData) => void | Promise<void>;
+  retryTargetStateAction: (formData: FormData) => void | Promise<void>;
   updateTreePlanAction: (formData: FormData) => void | Promise<void>;
 };
 
@@ -68,6 +69,7 @@ export function StudioLab({
   styleCatalog,
   developmentPlan,
   createTargetStateAction,
+  retryTargetStateAction,
   updateTreePlanAction,
 }: StudioLabProps) {
   const router = useRouter();
@@ -145,6 +147,14 @@ export function StudioLab({
           <span className="timeline-date">Design failed</span>
           <strong>The last design attempt did not finish.</strong>
           <p className="helper-text">{failedTarget.errorMessage ?? "Something went wrong. Try again."}</p>
+          <form action={retryTargetStateAction} className="inline-form">
+            <input name="targetId" type="hidden" value={failedTarget.id} />
+            <div className="capture-step-actions">
+              <SubmitButton className="button button-solid" pendingLabel="Starting the design...">
+                Design again
+              </SubmitButton>
+            </div>
+          </form>
         </section>
       ) : null}
 

@@ -1,7 +1,12 @@
-import path from "node:path";
 import { NextResponse } from "next/server";
 import { getViewer, resolvePhotoPathFromSegments } from "../../../../lib/bonsai";
-import { readPhotoFile } from "../../../../lib/storage-paths";
+import {
+  createPhotoSignedUrl,
+  getPhotoCacheControlHeader,
+  getSignedRedirectCacheControlHeader,
+  photoContentType,
+  readPhoto,
+} from "../../../../lib/photo-storage";
 
 type PhotoRouteProps = {
   params: Promise<{
@@ -19,33 +24,31 @@ export async function GET(_: Request, { params }: PhotoRouteProps) {
 
   try {
     const viewer = await getViewer();
-    const buffer = await readPhotoFile(viewer.id, storagePath);
+
+    // In supabase mode the bytes live in Storage: hand the browser a
+    // short-lived signed URL so the CDN serves them, instead of proxying every
+    // image through the app. Local mode (and the `stream` escape hatch) falls
+    // through to streaming below.
+    const signedUrl = await createPhotoSignedUrl(viewer.id, storagePath);
+
+    if (signedUrl) {
+      return NextResponse.redirect(signedUrl, {
+        status: 307,
+        headers: { "cache-control": getSignedRedirectCacheControlHeader() },
+      });
+    }
+
+    const buffer = await readPhoto(viewer.id, storagePath);
     const body = new Uint8Array(buffer);
 
     return new NextResponse(body, {
       headers: {
-        "content-type": contentTypeForExtension(path.extname(storagePath).toLowerCase()),
+        "content-type": photoContentType(storagePath),
         // Capture files never change once written; let the browser cache them.
-        "cache-control": "private, max-age=31536000, immutable",
+        "cache-control": getPhotoCacheControlHeader(),
       },
     });
   } catch {
     return new NextResponse("Not found", { status: 404 });
-  }
-}
-
-function contentTypeForExtension(extension: string) {
-  switch (extension) {
-    case ".png":
-      return "image/png";
-    case ".webp":
-      return "image/webp";
-    case ".gif":
-      return "image/gif";
-    case ".jpg":
-    case ".jpeg":
-      return "image/jpeg";
-    default:
-      return "application/octet-stream";
   }
 }

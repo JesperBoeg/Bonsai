@@ -1,70 +1,46 @@
 # CI/CD and deployment
 
-Bonsai deploys as containers on Render. That is the only deploy story: the web
-app needs a persistent filesystem (`/app/data`), so serverless platforms such as
-Vercel are not supported.
+Bonsai deploys as **one stateless container on Fly.io** — app `bonsai-progress`,
+live at https://bonsai-progress.fly.dev. Photo bytes live in Supabase Storage, so
+the container needs no persistent disk and machines are disposable.
 
-> **Before anything can deploy:** the Supabase project referenced in
-> `render.yaml` (`epqxygxvvlsobbyhhnke`) no longer resolves in DNS — it appears
-> to be paused or deleted. Restore it (or create a new project) in the Supabase
-> dashboard, update the URL/anon key in `render.yaml` and in GitHub secrets,
-> and re-apply migrations with `npx supabase db push` before deploying.
+Full runbook: [docs/DEPLOY.md](../docs/DEPLOY.md). Free-plan guardrails and the
+secrets they need: [docs/GUARDRAILS.md](../docs/GUARDRAILS.md).
 
-## How deployment works
+## Workflows
 
-- **Render Blueprint** (`render.yaml` at the repo root) defines both services:
-  - `bonsai-web` — Next.js app built from `apps/web/Dockerfile` with a
-    persistent disk at `/app/data`.
-  - `bonsai-vision` — FastAPI/PyTorch service built from
-    `services/vision/Dockerfile` with a persistent disk at `/app/.hf-cache`
-    for Hugging Face model weights.
-- Both services have `autoDeploy: true`, so **Render builds and deploys on
-  every push to `main`**. There is no deploy step in GitHub Actions.
-- **GitHub Actions** (`.github/workflows/main-ci-cd.yml`) is the quality gate:
-  it lints and builds the web app and runs the vision service's unit tests on
-  every push and pull request to `main`. Keep it green — Render deploys on
-  push regardless, so a red CI run means a bad deploy is already rolling out.
+| Workflow | Trigger | What it does |
+|---|---|---|
+| [`main-ci-cd.yml`](workflows/main-ci-cd.yml) | push + PR to `main` | quality gate: web lint/build, vision unit tests |
+| [`fly-deploy.yml`](workflows/fly-deploy.yml) | push to `main`, manual | `flyctl deploy --remote-only` |
+| [`keep-alive.yml`](workflows/keep-alive.yml) | daily 06:12 UTC, manual | pings `/api/health` and Postgres so the free project never idles into a pause |
+| [`nightly-backup.yml`](workflows/nightly-backup.yml) | daily 02:37 UTC, manual | `pg_dump` + storage-bucket copy as a private artifact; opens an issue past the 800 MB watermark |
+| [`restore-drill.yml`](workflows/restore-drill.yml) | manual | restores the newest backup into a scratch Postgres and verifies it |
 
-## GitHub secrets (CI build only)
+CI and deploy are independent: a push to `main` deploys whether or not CI is
+green, so a red CI run means a bad deploy is already rolling out.
 
-The web build job reads these repository secrets (used only so `next build`
-has real values; nothing is deployed from CI):
+## Repository secrets and variables
 
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `NEXT_PUBLIC_SITE_URL`
-- `VISION_SERVICE_URL`
+| Name | Kind | Used by |
+|---|---|---|
+| `FLY_API_TOKEN` | secret | `fly-deploy.yml` |
+| `SUPABASE_DB_URL` | secret | `nightly-backup.yml` (database dump) |
+| `SUPABASE_SERVICE_ROLE_KEY` | secret | `nightly-backup.yml` (storage copy) |
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_SITE_URL`, `VISION_SERVICE_URL` | secrets | `main-ci-cd.yml` build only |
+| `APP_URL`, `SUPABASE_URL`, `STORAGE_WATERMARK_MB`, `BACKUP_RETENTION_DAYS` | variables (optional) | guardrail crons; sensible defaults if unset |
 
-## Render environment variables
-
-Configured on `bonsai-web` (via `render.yaml`; `sync: false` values are entered
-in the Render dashboard):
-
-| Variable                        | Value / source                                                     |
-| ------------------------------- | ------------------------------------------------------------------ |
-| `NEXT_PUBLIC_SUPABASE_URL`      | Supabase project URL (in `render.yaml`; update after restore)      |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase publishable/anon key (in `render.yaml`; update after restore) |
-| `NEXT_PUBLIC_SITE_URL`          | The web service's own https URL, e.g. `https://bonsai-web.onrender.com` |
-| `VISION_SERVICE_URL`            | The vision service's https URL, e.g. `https://bonsai-vision.onrender.com` |
-| `ANTHROPIC_API_KEY`             | Anthropic API key (dashboard, `sync: false`)                       |
-| `GEMINI_API_KEY`                | Gemini API key (dashboard, `sync: false`; optional — only if `BONSAI_IMAGE_PROVIDER=gemini`) |
-| `BONSAI_IMAGE_PROVIDER`         | `gemini`                                                           |
-| `BONSAI_DATA_BACKEND`           | `supabase`                                                         |
+Runtime configuration is **not** in GitHub: non-secret env lives in
+[`fly.toml`](../fly.toml), secrets in `fly secrets set`.
 
 ## Database migrations
 
-Migrations in `supabase/migrations` are **not** applied by CI or Render. Apply
-them with the Supabase CLI:
+Applied by neither CI nor Fly:
 
 ```sh
+npx supabase link --project-ref epqxygxvvlsobbyhhnke
 npx supabase db push
 ```
 
-This requires either `SUPABASE_ACCESS_TOKEN` in the environment or a prior
-`supabase login`, plus the database password when prompted (the project must be
-linked, e.g. `npx supabase link --project-ref <ref>`).
-
-## Full runbook
-
-See [docs/DEPLOY.md](../docs/DEPLOY.md) for one-time Render setup, plans/costs,
-and post-deploy configuration.
+Needs `SUPABASE_ACCESS_TOKEN` (or a prior `supabase login`) plus the database
+password. Migrations 0001–0006 are applied in production.

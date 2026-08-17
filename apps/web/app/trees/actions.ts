@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getRequiredViewer } from "../../lib/auth";
 import { deleteTree, updateTreeDevelopmentPlan } from "../../lib/bonsai";
-import { startTargetStateGeneration } from "../../lib/studio";
+import { retryTargetStateGeneration, startTargetStateGeneration } from "../../lib/studio";
 
 function readRequiredString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -75,6 +75,15 @@ export async function createTargetStateAction(formData: FormData) {
     targetStyleId: modeValue === "directed" ? targetStyleId : null,
     horizonYears: modeValue === "directed" ? horizonYears : null,
   });
+
+  revalidatePath(`/trees/${treeId}`);
+  redirect(`/trees/${treeId}?tab=studio&target=${targetId}`);
+}
+
+export async function retryTargetStateAction(formData: FormData) {
+  const viewer = await getRequiredViewer();
+  const previousTargetId = readRequiredString(formData, "targetId");
+  const { targetId, treeId } = await retryTargetStateGeneration(viewer, previousTargetId);
 
   revalidatePath(`/trees/${treeId}`);
   redirect(`/trees/${treeId}?tab=studio&target=${targetId}`);

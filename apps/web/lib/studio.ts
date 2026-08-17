@@ -3,9 +3,9 @@ import { designTargetState, getClaudeModelId, isClaudeConfigured } from "./ai/cl
 import { getRenderProviderName, renderTargetImage } from "./ai/render";
 import { createPhotoUrl } from "./bonsai";
 import { getCatalogs, STYLE_CATALOG } from "./catalog";
-import { readPhotoFile, writePhotoFile } from "./storage-paths";
+import { photoContentType, readPhoto, writePhoto } from "./photo-storage";
 import { getCollectionStore } from "./store";
-import type { PhotoRecord, TargetStateMode, TargetStateRecord } from "./store/types";
+import type { PhotoRecord, TargetStateMode, TargetStateRecord, TargetStateStatus } from "./store/types";
 
 // The Design Studio pipeline: Claude designs the target state (assessment,
 // staged plan, and a constrained photo-edit instruction), then an image-editing
@@ -28,6 +28,15 @@ export type StudioData = {
 
 const runningPipelines = new Set<string>();
 
+// A design is an in-process background job, so it dies with the process: a
+// deploy, a crash, or a machine restart mid-design leaves a target stuck at
+// "analyzing" forever. Anything in progress for longer than this — and not
+// running in *this* process — is therefore an orphan, and gets swept into
+// "failed" so the card offers a retry instead of a spinner that never resolves.
+const STALE_IN_PROGRESS_MS = 10 * 60 * 1000;
+const IN_PROGRESS_STATUSES: TargetStateStatus[] = ["pending", "analyzing", "rendering"];
+const INTERRUPTED_MESSAGE = "This design was interrupted by a server restart. Design again to pick up from the current photos.";
+
 function toView(record: TargetStateRecord, sourcePhoto: PhotoRecord | null): StudioTargetView {
   const { imagePath, ...rest } = record;
 
@@ -40,7 +49,7 @@ function toView(record: TargetStateRecord, sourcePhoto: PhotoRecord | null): Stu
 
 export async function getStudioData(viewer: AuthenticatedViewer, treeId: string): Promise<StudioData> {
   const store = getCollectionStore();
-  const targets = await store.listTargetStatesForTree(viewer, treeId);
+  const targets = await sweepInterruptedTargets(viewer, await store.listTargetStatesForTree(viewer, treeId));
   const views: StudioTargetView[] = [];
 
   for (const target of targets) {
@@ -59,6 +68,71 @@ export async function getStudioData(viewer: AuthenticatedViewer, treeId: string)
     renderProvider: getRenderProviderName(),
     claudeModel: getClaudeModelId(),
   };
+}
+
+export async function sweepInterruptedTargets(
+  viewer: AuthenticatedViewer,
+  targets: TargetStateRecord[],
+): Promise<TargetStateRecord[]> {
+  const store = getCollectionStore();
+  const staleBefore = Date.now() - STALE_IN_PROGRESS_MS;
+  const swept: TargetStateRecord[] = [];
+
+  for (const target of targets) {
+    const isStale = IN_PROGRESS_STATUSES.includes(target.status)
+      && new Date(target.createdAt).valueOf() < staleBefore
+      && !runningPipelines.has(target.id);
+
+    if (!isStale) {
+      swept.push(target);
+      continue;
+    }
+
+    const failed: TargetStateRecord = { ...target, status: "failed", errorMessage: INTERRUPTED_MESSAGE };
+
+    try {
+      await store.updateTargetState(viewer, target.id, {
+        status: failed.status,
+        errorMessage: failed.errorMessage,
+      });
+      console.warn(`[studio] swept interrupted target ${target.id} (was ${target.status})`);
+    } catch (error) {
+      console.warn(`[studio] could not sweep interrupted target ${target.id}: ${(error as Error).message}`);
+    }
+
+    swept.push(failed);
+  }
+
+  return swept;
+}
+
+/**
+ * Re-runs a target design from scratch, reusing the original brief (and, when the
+ * first attempt got far enough to produce a plan, its style and horizon).
+ */
+export async function retryTargetStateGeneration(
+  viewer: AuthenticatedViewer,
+  targetId: string,
+): Promise<{ targetId: string; treeId: string }> {
+  const store = getCollectionStore();
+  const previous = await store.getTargetState(viewer, targetId);
+
+  if (!previous) {
+    throw new Error("That design is no longer available.");
+  }
+
+  const previousStyleSlug = previous.plan?.target.styleSlug ?? null;
+  const started = await startTargetStateGeneration(viewer, {
+    treeId: previous.treeId,
+    mode: previous.mode,
+    brief: previous.brief,
+    targetStyleId: previousStyleSlug
+      ? STYLE_CATALOG.find((entry) => entry.slug === previousStyleSlug)?.id ?? null
+      : null,
+    horizonYears: previous.plan?.target.horizonYears ?? null,
+  });
+
+  return { targetId: started.targetId, treeId: previous.treeId };
 }
 
 export type StartTargetStateInput = {
@@ -159,8 +233,8 @@ async function runTargetStatePipeline(
       ? STYLE_CATALOG.find((entry) => entry.id === input.targetStyleId) ?? null
       : null;
 
-    const sourceBuffer = await readPhotoFile(viewer.id, sourcePhoto.storagePath);
-    const sourceMimeType = mimeTypeForPath(sourcePhoto.storagePath);
+    const sourceBuffer = await readPhoto(viewer.id, sourcePhoto.storagePath);
+    const sourceMimeType = photoContentType(sourcePhoto.storagePath);
 
     // Up to two earlier photos give Claude the tree's development trajectory.
     const allPhotos = await store.listPhotosForTree(viewer, input.treeId);
@@ -172,8 +246,8 @@ async function runTargetStatePipeline(
 
     for (const photo of earlierPhotos) {
       try {
-        const buffer = await readPhotoFile(viewer.id, photo.storagePath);
-        extraImages.push({ base64: buffer.toString("base64"), mimeType: mimeTypeForPath(photo.storagePath) });
+        const buffer = await readPhoto(viewer.id, photo.storagePath);
+        extraImages.push({ base64: buffer.toString("base64"), mimeType: photoContentType(photo.storagePath) });
       } catch {
         // Missing historical file — skip it.
       }
@@ -217,7 +291,7 @@ async function runTargetStatePipeline(
         const extension = render.mimeType === "image/jpeg" ? "jpg" : render.mimeType === "image/webp" ? "webp" : "png";
         imagePath = `studio/${targetId}.${extension}`;
         renderProvider = render.provider;
-        await writePhotoFile(viewer.id, imagePath, Buffer.from(render.imageBase64, "base64"));
+        await writePhoto(viewer.id, imagePath, Buffer.from(render.imageBase64, "base64"));
       }
     } catch (error) {
       // The design plan is valuable on its own; deliver it and note why the
@@ -250,20 +324,3 @@ async function runTargetStatePipeline(
   }
 }
 
-function mimeTypeForPath(storagePath: string): "image/jpeg" | "image/png" | "image/webp" | "image/gif" {
-  const lower = storagePath.toLowerCase();
-
-  if (lower.endsWith(".png")) {
-    return "image/png";
-  }
-
-  if (lower.endsWith(".webp")) {
-    return "image/webp";
-  }
-
-  if (lower.endsWith(".gif")) {
-    return "image/gif";
-  }
-
-  return "image/jpeg";
-}

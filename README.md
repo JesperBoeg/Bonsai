@@ -34,9 +34,9 @@ Bonsai is being built as a phone-friendly web application with a separate vision
 
 ## CI/CD
 
-GitHub Actions is a quality gate only: it lints and builds the web app and runs the two vision test files on every push and pull request to `main`. Deployment is handled by Render — both services in `render.yaml` have `autoDeploy` enabled, so Render builds and deploys the containers on every push to `main`.
+GitHub Actions lints and builds the web app and runs the two vision test files on every push and pull request to `main`, and deploys the web app to Fly.io on every push to `main`. Production is live at [bonsai-progress.fly.dev](https://bonsai-progress.fly.dev) as a single stateless container; photo bytes live in Supabase Storage.
 
-The workflow, required secrets, and Render environment variables are documented in [.github/DEPLOYMENT.md](.github/DEPLOYMENT.md); the full deploy runbook is in [docs/DEPLOY.md](docs/DEPLOY.md).
+Workflows and required secrets are documented in [.github/DEPLOYMENT.md](.github/DEPLOYMENT.md), the full deploy runbook in [docs/DEPLOY.md](docs/DEPLOY.md), and the Supabase free-plan guardrails (keep-alive, backups, SMTP, storage watermark) in [docs/GUARDRAILS.md](docs/GUARDRAILS.md).
 
 ## Architecture notes
 
