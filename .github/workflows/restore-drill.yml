@@ -82,15 +82,33 @@ jobs:
           gh run download "$RUN_ID" --dir restore
           find restore -maxdepth 3 -name '*.dump' -o -maxdepth 3 -name manifest.json | sort
 
-      - name: Enable pgvector in the scratch database
+      - name: Prepare the scratch database
         env:
           PGPASSWORD: drill
         run: |
           set -euo pipefail
-          # The dump's vector columns need the extension; the postgres:17 image
-          # ships pgvector as of 17, and the drill fails loudly here if it does not.
-          psql -h localhost -U postgres -d drill -c "create extension if not exists vector" \
-            || echo "::warning::pgvector unavailable — vector columns will be reported by the drill."
+          # Two things the dump needs from a vanilla Postgres:
+          #   - pgvector, because the photo tables declare vector(768) columns;
+          #   - Supabase's roles, because RLS policies name them ("to authenticated")
+          #     and policies are schema, not privileges — so pg_dump keeps them even
+          #     with --no-privileges, and every policy fails without the role.
+          # Stub roles are enough: the drill is about the data coming back, not about
+          # reproducing Supabase's permission model. Re-running is safe; psql without
+          # ON_ERROR_STOP reports "already exists" and carries on.
+          cat > roles.sql <<'SQL'
+          create extension if not exists vector;
+          create role anon nologin;
+          create role authenticated nologin;
+          create role service_role nologin;
+          create role authenticator noinherit nologin;
+          create role supabase_admin nologin;
+          create role supabase_auth_admin nologin;
+          create role supabase_storage_admin nologin;
+          create role dashboard_user nologin;
+          SQL
+          sed -i 's/^          //' roles.sql
+          psql -h localhost -U postgres -d drill -f roles.sql
+          psql -h localhost -U postgres -d drill -tAc "select count(*) from pg_roles where rolname in ('anon','authenticated','service_role')"
 
       - name: Restore and verify
         env:
