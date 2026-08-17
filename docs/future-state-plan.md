@@ -10,7 +10,7 @@ This document is the single source of truth for where the product's infrastructu
 
 ## 1. Where we are today (validated baseline)
 
-Everything below is implemented and CI-green, and was validated visually end-to-end (Playwright drives, screenshots reviewed) — in local mode and against the live Supabase project. The Stage A/C work described here is in the repository; §7 records what has shipped to production and what has not.
+Everything below is implemented and CI-green, and was validated visually end-to-end (Playwright drives, screenshots reviewed) — in local mode and against the live Supabase project. All of it is live in production; §7 records the per-step state.
 
 | Area | State |
 |---|---|
