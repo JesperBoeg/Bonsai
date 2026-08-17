@@ -87,12 +87,58 @@ export async function createConfirmedAccount(email: string, password: string): P
 
   const detail = await response.text();
 
-  // Already registered: let the caller fall through to a normal sign-in attempt.
+  // Already registered — most likely an address that signed up before sign-ups
+  // closed and is still waiting on a confirmation email it should no longer need.
+  // Confirm it so the password they chose simply works.
   if (response.status === 422 || /already been registered|already exists/i.test(detail)) {
+    await confirmExistingAccount(email);
     return { kind: "exists" };
   }
 
   return { kind: "unavailable", reason: `Supabase refused the account (${response.status}).` };
+}
+
+async function confirmExistingAccount(email: string) {
+  const serviceRoleKey = getServiceRoleKey();
+
+  if (!serviceRoleKey) {
+    return;
+  }
+
+  const headers = {
+    apikey: serviceRoleKey,
+    authorization: `Bearer ${serviceRoleKey}`,
+    "content-type": "application/json",
+  };
+
+  try {
+    const lookup = await fetch(
+      `${getSupabaseUrl()}/auth/v1/admin/users?filter=${encodeURIComponent(email)}&per_page=1`,
+      { headers, cache: "no-store" },
+    );
+
+    if (!lookup.ok) {
+      return;
+    }
+
+    const user = ((await lookup.json()) as { users?: Array<{ id: string; email: string; email_confirmed_at: string | null }> })
+      .users
+      ?.find((candidate) => candidate.email?.toLowerCase() === email.toLowerCase());
+
+    if (!user || user.email_confirmed_at) {
+      return;
+    }
+
+    await fetch(`${getSupabaseUrl()}/auth/v1/admin/users/${user.id}`, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify({ email_confirm: true }),
+      cache: "no-store",
+    });
+  } catch (error) {
+    // Best effort: the sign-in attempt that follows reports the real outcome.
+    console.warn(`[signup] could not confirm the existing account: ${(error as Error).message}`);
+  }
 }
 
 /** True when the anon key is present, i.e. the auth UI has something to talk to. */

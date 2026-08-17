@@ -49,6 +49,9 @@ Non-secret config lives in [`fly.toml`](../fly.toml) `[env]`; secrets are set wi
 | `ANTHROPIC_API_KEY` | rotated Anthropic key | `fly secrets set` |
 | `GEMINI_API_KEY` | optional, for photoreal renders | `fly secrets set` |
 | `VISION_SERVICE_URL` | interim vision host, or unset for graceful degradation | `fly secrets set` |
+| `BONSAI_SIGNUP_MODE` | `closed` — no public sign-up (see below). `open` restores self-serve sign-up | `fly.toml` |
+| `BONSAI_SIGNUP_ALLOWLIST` | addresses that may still create an account while closed, comma-separated | `fly.toml` |
+| `SUPABASE_SERVICE_ROLE_KEY` | needed only for allowlisted account creation; bypasses RLS | `fly secrets set` |
 | `BONSAI_PHOTO_SERVING` | unset (signed-URL redirects). `stream` proxies bytes through the app instead | `fly secrets set` |
 | `BONSAI_REPO_ROOT` | not needed — marker discovery works in the image | override only |
 
@@ -105,6 +108,32 @@ the database password. Migrations 0001–0006 are applied in production.
     node scripts/migrate-photos-to-storage.mjs --dry-run
   # then without --dry-run; it is idempotent and verifies every upload by hash
   ```
+
+## Sign-ups (currently closed)
+
+Bonsai is in private testing, so account creation is off — in two places, because
+the app alone would not be a boundary. The anon key ships in the client bundle, so
+anyone could call Supabase's sign-up endpoint directly.
+
+1. **Supabase project config**: `disable_signup = true`. The public endpoint answers
+   `422 signup_disabled`. This is the actual gate.
+2. **App** (`BONSAI_SIGNUP_MODE=closed`, [`lib/signup.ts`](../apps/web/lib/signup.ts)):
+   `/sign-in` renders no create-account form and says accounts are invite-only. The
+   form remains reachable at `/sign-in?signup=1`, and the server action refuses any
+   address outside `BONSAI_SIGNUP_ALLOWLIST` regardless of what the UI did.
+
+An allowlisted address gets an account **immediately, with no confirmation email**:
+it is created through the admin API as already-confirmed and signed straight in.
+Plus-aliases normalise to the base address, so `owner+test@gmail.com` counts as
+`owner@gmail.com`. An allowlisted address that already exists but is unconfirmed
+(signed up before sign-ups closed) gets confirmed on the next attempt, so its
+original password simply starts working.
+
+To invite someone: add their address to `BONSAI_SIGNUP_ALLOWLIST` in `fly.toml`,
+push, and send them `/sign-in?signup=1`. To open the doors properly: set
+`BONSAI_SIGNUP_MODE=open` **and** flip `disable_signup` back to `false` in Supabase
+(Authentication → Sign In / Providers), which restores ordinary sign-up with email
+confirmation.
 
 ## The vision service
 

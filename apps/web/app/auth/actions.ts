@@ -109,7 +109,7 @@ export async function createPasswordAccountAction(formData: FormData) {
     if (signInError) {
       redirect(signInFailed(
         result.kind === "exists"
-          ? "That address already has an account, and the password did not match it."
+          ? "That address already has an account. Use the sign-in form with its existing password."
           : signInError.message,
       ));
     }
