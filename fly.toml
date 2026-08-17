@@ -7,6 +7,7 @@
 # Secrets are NOT set here — set ANTHROPIC_API_KEY (and optionally
 # GEMINI_API_KEY) via the app's Secrets page or `fly secrets set`.
 
+app = "bonsai-progress"
 primary_region = "ams"
 
 [build]
