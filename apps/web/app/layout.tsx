@@ -39,6 +39,12 @@ export const viewport: Viewport = {
   themeColor: "#5f7a53",
 };
 
+// Every page is per-user; nothing may be prerendered at build time. Without
+// this, a build without deployment env vars silently evaluates pages in the
+// local-mode fallback and bakes its output (e.g. sign-in's redirect) into
+// static HTML.
+export const dynamic = "force-dynamic";
+
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const viewer = await getOptionalViewer();
   const localMode = isLocalBackend();
