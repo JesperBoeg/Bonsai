@@ -292,19 +292,34 @@ export class SupabaseCollectionStore implements CollectionStore {
       developmentPlan: null,
     };
 
-    const { error } = await supabase.from("trees").insert({
+    const insertTree = (inventoryName: string) => supabase.from("trees").insert({
       id: tree.id,
       owner_id: tree.ownerId,
       species_id: tree.speciesId,
       style_id: tree.styleId,
       sequence_number: tree.sequenceNumber,
-      inventory_name: tree.inventoryName,
+      inventory_name: inventoryName,
       created_at: tree.createdAt,
       development_plan: null,
     });
 
+    const { error } = await insertTree(tree.inventoryName);
+
     if (error) {
-      raiseStoreError(error);
+      // Tree names are unique per owner. The default wizard name is just
+      // "species - style", so a second tree of the same pair collides —
+      // disambiguate with the allocated sequence number, as the naming
+      // rule always intended.
+      if (error.code === "23505" && error.message.includes("inventory_name")) {
+        tree.inventoryName = `${tree.inventoryName} ${String(tree.sequenceNumber).padStart(2, "0")}`;
+        const { error: retryError } = await insertTree(tree.inventoryName);
+
+        if (retryError) {
+          raiseStoreError(retryError);
+        }
+      } else {
+        raiseStoreError(error);
+      }
     }
 
     return tree;

@@ -105,13 +105,19 @@ export class LocalCollectionStore implements CollectionStore {
       const sequenceNumber = Math.max(document.sequenceCounters[key] ?? 0, highestExisting) + 1;
       document.sequenceCounters[key] = sequenceNumber;
 
+      // Same naming rule as the Supabase backend: names are unique per owner,
+      // so a colliding default name gets the sequence number appended.
+      const inventoryName = document.trees.some((tree) => tree.inventoryName === input.inventoryName)
+        ? `${input.inventoryName} ${String(sequenceNumber).padStart(2, "0")}`
+        : input.inventoryName;
+
       const tree: TreeRecord = {
         id: crypto.randomUUID(),
         ownerId: viewer.id,
         speciesId: input.speciesId,
         styleId: input.styleId,
         sequenceNumber,
-        inventoryName: input.inventoryName,
+        inventoryName,
         createdAt: input.createdAt,
         developmentPlan: null,
       };
