@@ -1,0 +1,40 @@
+# Fly.io configuration for the Bonsai web app.
+#
+# The Dockerfile lives in apps/web but MUST build with the repo root as its
+# context (it copies the root package-lock and services/vision/catalog JSONs),
+# which is why this file sits at the repo root and points at it.
+#
+# Secrets are NOT set here — set ANTHROPIC_API_KEY (and optionally
+# GEMINI_API_KEY) via the app's Secrets page or `fly secrets set`.
+
+primary_region = "ams"
+
+[build]
+  dockerfile = "apps/web/Dockerfile"
+
+[env]
+  BONSAI_DATA_BACKEND = "supabase"
+  BONSAI_IMAGE_PROVIDER = "none"
+  NEXT_PUBLIC_SUPABASE_URL = "https://epqxygxvvlsobbyhhnke.supabase.co"
+  NEXT_PUBLIC_SUPABASE_ANON_KEY = "sb_publishable_REgFRCS_t7Rmf_s0uxx4KA_-KOIDNpf"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  # Always-on: Studio designs run as in-process background jobs.
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
+
+[checks]
+  [checks.web]
+    type = "http"
+    port = 3000
+    path = "/sign-in"
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "30s"
