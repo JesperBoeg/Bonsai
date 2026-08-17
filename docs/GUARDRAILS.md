@@ -24,17 +24,17 @@ Set these in **GitHub → Settings → Secrets and variables → Actions**.
 
 | Name | Kind | Needed by | Where to find it |
 |---|---|---|---|
-| `SUPABASE_DB_URL` | secret | nightly backup | Supabase → Project settings → Database → Connection string → URI (session pooler), password included |
-| `SUPABASE_SERVICE_ROLE_KEY` | secret | nightly backup | Supabase → Project settings → API → `service_role` key |
-| `FLY_API_TOKEN` | secret | deploy | `fly tokens create deploy` |
+| `SUPABASE_DB_URL` | secret | nightly backup | **set 2026-08-17.** Session pooler URI: `postgresql://postgres.epqxygxvvlsobbyhhnke@aws-1-eu-central-1.pooler.supabase.com:5432/postgres` with the database password. Session mode on 5432, not transaction mode on 6543 — `pg_dump` needs a session, and GitHub runners are IPv4-only while the direct host is IPv6-only |
+| `SUPABASE_SERVICE_ROLE_KEY` | secret | nightly backup | **set 2026-08-17.** Supabase → Project Settings → API Keys → `service_role` |
+| `FLY_API_TOKEN` | secret | deploy | **rotated 2026-08-17** to app token `github-actions-deploy-2026-08` (1-year expiry); the previous token was revoked. Renew with `fly tokens create deploy -a bonsai-progress -x 8760h` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | secret (optional) | keep-alive, CI build | Supabase → Project settings → API → publishable key |
 | `APP_URL` | variable (optional) | keep-alive | defaults to `https://bonsai-progress.fly.dev` |
 | `SUPABASE_URL` | variable (optional) | backup, keep-alive | defaults to the current project URL |
 | `STORAGE_WATERMARK_MB` | variable (optional) | watermark | defaults to `800` |
 | `BACKUP_RETENTION_DAYS` | variable (optional) | backup artifacts | defaults to `30` |
 
-Until `SUPABASE_DB_URL` and `SUPABASE_SERVICE_ROLE_KEY` exist, the nightly backup
-**fails on purpose** — a silent no-op backup is worse than a red run.
+All three are set. Should either Supabase secret ever be removed, the nightly
+backup **fails on purpose** — a silent no-op backup is worse than a red run.
 
 ---
 
@@ -90,14 +90,24 @@ and raises it to a configurable 30+/hour.
    SMTP, fill in host/port/username/password, set the sender name and address to
    the verified sender.
 4. Raise **Authentication → Rate limits → Emails per hour** to 30 or more.
-5. Supabase dashboard → **Authentication → URL Configuration**: Site URL
-   `https://bonsai-progress.fly.dev`, and the same URL in the redirect allow-list
-   so `/auth/callback` works.
+5. URL configuration — **already done (2026-08-17)**, and it was wrong before:
+   Site URL was still `http://localhost:3000`, so every production confirmation
+   link pointed at a machine that is not the app. It is now
+   `https://bonsai-progress.fly.dev/auth/callback` (the path matters — GoTrue
+   redirects the confirmation link there verbatim, and that route is what exchanges
+   the code for a session), with the allow-list covering
+   `https://bonsai-progress.fly.dev/**` plus localhost ports 3000 and 3100 for
+   development.
 6. Verify: sign up a throwaway address in production, confirm the email arrives
    from your sender, and click through to a signed-in session.
 
 Status: **not configured yet** — until it is, production sign-ups are capped at
-about two per hour.
+about two per hour, and `rate_limit_email_sent` stays at 2. What has been verified
+without SMTP: a sign-up through the production UI is accepted, the confirmation
+link resolves to the production callback (no longer localhost), the account ends up
+confirmed, and it can sign in and see its own empty collection. The one leg that
+needs a real delivered email is the click-through auto-sign-in, because only a real
+signup mail carries the PKCE `?code=` that `/auth/callback` exchanges.
 
 ## 4. Storage watermark (part of the nightly backup)
 
@@ -112,16 +122,24 @@ Free-plan ceilings worth remembering: ~2,000–2,500 photos (1 GB at ~400 KB eac
 
 ## 5. Restore drill
 
-Run **Actions → Restore drill → Run workflow** after the first successful nightly
-backup. It restores the newest backup into a throwaway `pgvector/pgvector:pg17`
-service container and asserts the restored data is usable: expected tables and
-the `allocate_tree_sequence()` RPC exist, the species catalog still has its 244
-pinned IDs, no photo row is orphaned, and every storage object matches its
-manifest hash.
+**Passed 2026-08-17 — 12/12 checks.** Re-run **Actions → Restore drill → Run
+workflow** whenever the schema changes materially. It restores the newest backup into a throwaway `pgvector/pgvector:pg17` service
+container and asserts the restored data is usable: expected tables and the
+`allocate_tree_sequence()` RPC exist, the species catalog still has its 244 pinned
+IDs, no photo row is orphaned, and every storage object matches its manifest hash.
+
+The restore runs in three phases — schema + data, then seeding `auth.users` from
+the restored owner ids, then constraints and policies. That is not ceremony: the
+dump's foreign keys point at `auth.users`, a table Supabase owns and the dump
+deliberately does not carry, so restoring in one shot buries real problems under
+ignored errors. Done in phases, the foreign keys have to build, which additionally
+proves every owner id survived the round trip. Two complaints are still expected
+and explicitly allowlisted (`--clean` cannot drop `public` because the scratch
+database must pre-create pgvector); any other error fails the drill.
 
 | Date | Backup run | Result | Notes |
 |---|---|---|---|
-| _pending_ | — | — | Run once after the first nightly backup completes. |
+| 2026-08-17 | `bonsai-backup-20260817T152958Z` (75 KB dump, 4 objects / 0.7 MB) | **PASS 12/12** | Restored into `pgvector/pgvector:pg17`. 244 species with no ID drift, `allocate_tree_sequence()` present, 3 trees / 3 photos / 3 submissions / 3 targets, no orphan photos, 4/4 storage hashes matched, every foreign key rebuilt. |
 
 ---
 
@@ -134,7 +152,9 @@ action, tracked in [future-state-plan.md](future-state-plan.md) §5.4):
 |---|---|---|
 | Anthropic API key | rotate, then `fly secrets set ANTHROPIC_API_KEY=…` and update `apps/web/.env.local` | owner to confirm |
 | Supabase access token (migrations) | revoke in Supabase → Account → Access tokens | owner to confirm |
-| Fly deploy token | `fly tokens create deploy`, update the `FLY_API_TOKEN` GitHub secret, revoke the old one | owner to confirm |
+| Fly deploy token | rotated to `github-actions-deploy-2026-08`, GitHub secret updated, verified by a deploy, old token revoked | **done 2026-08-17** |
+| Supabase database password | reset via the Management API; the new one exists only inside the `SUPABASE_DB_URL` secret. `npx supabase db push` will prompt for it — reset it again in the dashboard when you next need it by hand | **rotated 2026-08-17** |
+| Supabase Management access token | a temporary one was used for the work above; revoke it at https://supabase.com/dashboard/account/tokens | owner to revoke |
 
 The Supabase publishable/anon key is not a secret — it ships in the client bundle
 and is scoped by RLS. The `service_role` key is the opposite: it bypasses RLS, so

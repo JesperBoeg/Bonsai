@@ -1,6 +1,6 @@
 # Bonsai — Future-State Plan
 
-Status: **Stage A complete and live in production at https://bonsai-progress.fly.dev** (Fly.io, ams; push-to-main auto-deploys). A1 (guardrails), A2 (Storage migration), A3 (container deploy), A4 (production smoke test **including the redeploy-persistence proof**) and C1 (Studio sweeper) are done and validated. Everything still open is owner-gated, not code-gated: an SMTP account (A1's last quarter), two backup secrets, `VOYAGE_API_KEY` (B1 gate → B2/B3), one restore-drill run (C2), and the key rotations.
+Status: **Stage A complete and live in production at https://bonsai-progress.fly.dev** (Fly.io, ams; push-to-main auto-deploys). A1 (guardrails), A2 (Storage migration), A3 (container deploy), A4 (production smoke test **including the redeploy-persistence proof**) and C1 (Studio sweeper) are done and validated. A1 is complete: the backup secrets are set, the nightly backup has produced a verified artifact, and the restore drill passed 12/12. What remains is an SMTP account (A1's last quarter), `VOYAGE_API_KEY` (B1 gate → B2/B3), and rotating the Anthropic key.
 Last updated: 2026-08-17
 Companion docs: [architecture.md](architecture.md) (original recognition design), [DEPLOY.md](DEPLOY.md) (Fly deploy runbook), [GUARDRAILS.md](GUARDRAILS.md) (the four free-plan guardrails and their secrets), the review/implementation report artifact (claude.ai artifact "Bonsai — App Review & AI Roadmap").
 
@@ -22,7 +22,8 @@ Everything below is implemented and CI-green, and was validated visually end-to-
 | AI Design Studio | Two-stage pipeline live: Claude designs (assessment, staged seasonal plan, constrained photo-edit instruction) → image provider renders (`gemini` implemented, `mock` for dev, `none`). Validated live end-to-end incl. persistence to `tree_target_states`. |
 | Identity matching | Python vision service (FastAPI + DINOv2 CPU), per-embedding-model candidate scoring (legacy `pixel-rgb-16` embeddings coexist with `dinov2-base-pooler`). **Not deployed** — `VISION_SERVICE_URL` is unset in production, so automatic identity matching is off and users pick the tree manually; everything else degrades gracefully. |
 | Deploy story | **Fly.io** — app `bonsai-progress` (ams, one 512 MB machine), `fly.toml` + a deploy Action on `main`. `render.yaml` deleted; `DEPLOY.md` and `.github/DEPLOYMENT.md` rewritten to the Fly shape. CI is a lint/build/test quality gate on `main`. |
-| Guardrail crons | Keep-alive, nightly backup (`pg_dump` + bucket copy as a private artifact), storage watermark → GitHub issue, and a manual restore drill. `/api/health` reports app + database state. Secrets still owed for the backup job. |
+| Guardrail crons | Keep-alive, nightly backup (`pg_dump` + bucket copy as a private artifact), storage watermark → GitHub issue, and a manual restore drill. `/api/health` reports app + database state. Secrets set 2026-08-17; first backup verified and the restore drill passed 12/12 the same day. |
+| Auth URLs | Fixed 2026-08-17: Site URL had still been `http://localhost:3000`, so every production confirmation link pointed at localhost. Now `https://bonsai-progress.fly.dev/auth/callback` with an allow-list covering production and local dev. |
 | Robustness | Studio designs interrupted by a restart are swept to `failed` after 10 minutes with a "Design again" retry, instead of spinning forever (Stage C1 — done and validated). |
 | PWA | Installable: icons, manifest, service worker (production-only registration), offline page. |
 
@@ -148,9 +149,9 @@ Nothing here is built: migration 0007 and the matching relocation are gated on 4
 ## 5. Stage C — robustness + cleanup
 
 1. **Studio stale-job sweeper** ✅ **done and validated.** On Studio data load *and* on every poll of `/api/studio/[targetId]`, any target in progress for more than 10 minutes that is not running in this process is marked `failed` with "This design was interrupted by a server restart. Design again to pick up from the current photos.", and the failed card carries a **Design again** button that re-runs the design with the original brief (and the previous plan's style/horizon when it got that far). Validated by planting a target stuck at `analyzing` 30 minutes old: the card replaced the spinner, the row flipped to `failed`, and the retry produced a new `ready` design that renders.
-2. **Backups get restore-tested** — the drill is automated but **not yet run**: `.github/workflows/restore-drill.yml` restores the newest backup artifact into a throwaway `pgvector/pgvector:pg17` container and `scripts/restore-drill.mjs` asserts tables, the `allocate_tree_sequence()` RPC, 244 species with no ID drift, no orphaned photo rows, and every storage object matching its manifest hash. It needs one successful nightly backup first (which needs the two secrets in [GUARDRAILS.md](GUARDRAILS.md)).
+2. **Backups get restore-tested** ✅ **done — passed 2026-08-17, 12/12 checks.** `.github/workflows/restore-drill.yml` restores the newest backup artifact into a throwaway `pgvector/pgvector:pg17` container and `scripts/restore-drill.mjs` asserts tables, the `allocate_tree_sequence()` RPC, 244 species with no ID drift, no orphaned photo rows, and every storage object matching its manifest hash. It restores in three phases so the foreign keys pointing at Supabase-owned `auth.users` have to rebuild — which additionally proves every owner id survived the round trip.
 3. Deploy-config cleanup ✅ **done** — `render.yaml` deleted, `DEPLOY.md` + `.github/DEPLOYMENT.md` + `README.md` rewritten to the Fly shape, `.env.example` extended, Dockerfile comment corrected (the `/app/data` directory is local-mode scratch space now, not a disk to mount). CI unchanged as the quality gate.
-4. Key hygiene confirmation — **owner action, still open**: rotate the chat-exposed Anthropic key, revoke the Supabase access token, rotate the Fly deploy token. Checklist with commands in [GUARDRAILS.md](GUARDRAILS.md#key-hygiene).
+4. Key hygiene — **Fly deploy token rotated** (new 1-year app token, GitHub secret updated, deploy verified, old token revoked) and the **database password reset** into the backup secret. Still owed by the owner: rotate the chat-exposed Anthropic key and revoke the Supabase Management access token. Checklist in [GUARDRAILS.md](GUARDRAILS.md#key-hygiene).
 
 ---
 
@@ -161,9 +162,10 @@ Nothing here is built: migration 0007 and the matching relocation are gated on 4
 | Guardrail | Implementation | State |
 |---|---|---|
 | Keep-alive | `.github/workflows/keep-alive.yml`, daily 06:12 UTC: `GET /api/health` (which itself round-trips to Postgres and reports `database`) plus a direct REST `select` so the database sees traffic even if the container is down. Fails the run on either. | **done** — both steps executed successfully by hand; the health endpoint's `ok` / `degraded` / `?strict=1` 503 behaviour was verified against a reachable and an unreachable project |
-| DIY backups | `.github/workflows/nightly-backup.yml`, daily 02:37 UTC: `pg_dump --format=custom --schema=public` + a full copy of the bucket with a sha256 manifest (`scripts/backup-storage-bucket.mjs`), uploaded as one private artifact (30-day retention). Supabase-managed `auth`/`storage` schemas are excluded on purpose — re-uploading photos recreates their metadata rows. | **code done, needs secrets** — `SUPABASE_DB_URL` + `SUPABASE_SERVICE_ROLE_KEY`. The job fails loudly until they exist, because a silent no-op backup is worse than a red run |
+| DIY backups | `.github/workflows/nightly-backup.yml`, daily 02:37 UTC: `pg_dump --format=custom --schema=public` + a full copy of the bucket with a sha256 manifest (`scripts/backup-storage-bucket.mjs`), uploaded as one private artifact (30-day retention). Supabase-managed `auth`/`storage` schemas are excluded on purpose — re-uploading photos recreates their metadata rows. | **done and verified 2026-08-17** — secrets set, first run produced `bonsai-backup-20260817T152958Z` (75 KB dump + 4 objects), and the drill restored it. Two things the first real run taught: the runner puts PostgreSQL 16 ahead of the installed 17 client on PATH, and the session pooler (5432) is required because runners are IPv4-only |
 | Custom SMTP | Resend/Brevo free tier in Supabase auth settings (default sender = ~2 emails/hour, an onboarding-killer; custom SMTP → 30+/hour configurable) | **owner action** — step-by-step in [GUARDRAILS.md](GUARDRAILS.md) §3 |
-| Storage watermark | Same nightly job measures the bucket and, past 800 MB (`STORAGE_WATERMARK_MB`), opens or comments on a GitHub issue titled "Storage watermark passed — plan the Supabase Pro upgrade" | **done** (rides on the backup job's secrets) |
+| Storage watermark | Same nightly job measures the bucket and, past 800 MB (`STORAGE_WATERMARK_MB`), opens or comments on a GitHub issue titled "Storage watermark passed — plan the Supabase Pro upgrade" | **done** — the first run measured 0.7 MB and correctly skipped the alert |
+| Restore drill | `.github/workflows/restore-drill.yml` — phased restore into a throwaway `pgvector/pgvector:pg17` container, asserting tables, RPC, 244 species with no ID drift, no orphan photos, every storage hash, and that all foreign keys rebuild | **passed 2026-08-17, 12/12** |
 
 **Free-plan ceilings to respect:** ~2,000–2,500 photos (1 GB at current ~400 KB client-side compression), 5 GB egress/month (~10k image views; immutable caching stretches this), 500 MB database (ample — embeddings are KBs), no managed backups (mitigated above).
 
@@ -179,7 +181,7 @@ Nothing here is built: migration 0007 and the matching relocation are gated on 4
 
 | Step | State | Blocked on |
 |---|---|---|
-| A1 Guardrail crons (keep-alive, backups, watermark) | **done** — three workflows + `/api/health` | backup job needs `SUPABASE_DB_URL` + `SUPABASE_SERVICE_ROLE_KEY` (owner) |
+| A1 Guardrail crons (keep-alive, backups, watermark) | **done and verified** — three workflows + `/api/health`; secrets set, backup artifact produced, drill passed | — |
 | A1b Custom SMTP | not started (dashboard-only work) | Resend/Brevo account (owner) |
 | A2 Storage migration code + migration script | **done and validated** against the live project | — |
 | A3 Container deploy + deploy Action | **done** — Fly app `bonsai-progress` (ams, 512 MB, single machine), `fly.toml`, deploy Action on `main`, `ANTHROPIC_API_KEY` secret set | — |
@@ -188,7 +190,7 @@ Nothing here is built: migration 0007 and the matching relocation are gated on 4
 | B2 Migration 0007 + matching relocation + re-embed + leaf index | intentionally not started | B1 gate passing |
 | B3 Vision service retirement | intentionally not started | B2 validated |
 | C1 Studio sweeper + retry | **done and validated** | — |
-| C2 Restore drill, config cleanup, docs, key-hygiene check | config + docs + drill automation **done**; drill unrun | one successful nightly backup; owner key rotation |
+| C2 Restore drill, config cleanup, docs, key-hygiene check | **done** — drill passed 12/12, config and docs rewritten, Fly token and database password rotated | Anthropic key rotation + Supabase token revocation (owner) |
 
 Validation bar for every stage: the same as this whole effort — drive the real app, screenshot it, verify the rows/objects landed, never call it done on theory.
 
@@ -196,11 +198,11 @@ Validation bar for every stage: the same as this whole effort — drive the real
 
 1. ~~Container host~~ — **resolved: Fly.io**, live in `ams`. The vision service is not hosted anywhere; capture degrades gracefully until Stage B resolves it.
 2. ~~Deploy Stage A2~~ — **shipped and verified in production** (commit "Ship Stage A of the future-state plan", CI and deploy green, A4 passed).
-3. **Backup secrets** — `SUPABASE_DB_URL` and `SUPABASE_SERVICE_ROLE_KEY` as repository secrets; without them the nightly backup fails by design.
-4. **SMTP provider account** (Resend or Brevo free tier) — the last quarter of A1, and the thing that currently caps sign-ups at ~2/hour.
+3. ~~Backup secrets~~ — **set 2026-08-17**, backup verified, restore drill passed.
+4. **SMTP provider account** — the last quarter of A1, and the thing that currently caps sign-ups at ~2/hour. Brevo needs no DNS (verify a single sender address); Resend needs a domain you control.
 5. **`GEMINI_API_KEY`** (optional, any time) — turns Studio renders photoreal; the provider interface and `mock`/`none` fallbacks are already shipped.
 6. **`VOYAGE_API_KEY`** — needed to run B1, which gates all of Stage B.
-7. Confirm the Anthropic key rotation, Supabase access-token revocation, and Fly token rotation happened ([checklist](GUARDRAILS.md#key-hygiene)).
+7. **Anthropic key rotation** and **revoking the Supabase Management access token** — the only key-hygiene items left; the Fly token and database password were rotated on 2026-08-17 ([checklist](GUARDRAILS.md#key-hygiene)).
 
 ## Deferred by design (tracked, not planned)
 
