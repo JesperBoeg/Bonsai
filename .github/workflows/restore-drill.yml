@@ -79,7 +79,20 @@ jobs:
             exit 1
           fi
           echo "Restoring the backup from run $RUN_ID."
-          gh run download "$RUN_ID" --dir restore
+          # The artifacts API returns the odd 503; a drill that fails for that
+          # reason teaches nothing, so retry before giving up.
+          for attempt in 1 2 3 4 5; do
+            if gh run download "$RUN_ID" --dir restore; then
+              break
+            fi
+            if [ "$attempt" = "5" ]; then
+              echo "::error::Could not download the backup artifact after 5 attempts."
+              exit 1
+            fi
+            echo "download attempt $attempt failed; retrying in 20s"
+            rm -rf restore
+            sleep 20
+          done
           find restore -maxdepth 3 -name '*.dump' -o -maxdepth 3 -name manifest.json | sort
 
       - name: Prepare the scratch database
