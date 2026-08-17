@@ -18,3 +18,8 @@ dependencies = [
   "transformers>=5.0.0",
   "uvicorn[standard]>=0.32.0"
 ]
+
+[tool.setuptools]
+# Deps-only distribution: the service runs from the source tree (uvicorn app.main);
+# nothing is importable as an installed package.
+py-modules = []
