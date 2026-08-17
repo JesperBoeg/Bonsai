@@ -1,12 +1,14 @@
 import { createPasswordAccountAction, signInWithPasswordAction } from "../auth/actions";
 import { getOptionalViewer } from "../../lib/auth";
 import { redirect } from "next/navigation";
+import { getSignupMode } from "../../lib/signup";
 
 type SignInPageProps = {
   searchParams: Promise<{
     error?: string;
     next?: string;
     created?: string;
+    signup?: string;
   }>;
 };
 
@@ -19,12 +21,18 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
 
   const params = await searchParams;
   const nextPath = params.next && params.next.startsWith("/") ? params.next : "/capture";
+  const signupMode = getSignupMode();
+  // While sign-ups are closed there is no public "create account" affordance. The
+  // form is still reachable at /sign-in?signup=1 for allowlisted addresses — the
+  // real gate is server-side (and in Supabase's own config), so revealing the form
+  // gives nothing away.
+  const showCreateAccount = signupMode === "open" || params.signup === "1";
 
   return (
     <div className="page-stack">
       <section className="section-heading">
         <p className="eyebrow">Authentication</p>
-        <h1>Sign in or create an account.</h1>
+        <h1>{signupMode === "open" ? "Sign in or create an account." : "Sign in."}</h1>
         <p className="lede">Use your email address and password to continue.</p>
       </section>
 
@@ -46,30 +54,45 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
             </button>
           </form>
           {params.error ? <p className="status-strip">{params.error}</p> : null}
-        </article>
-
-        <article className="capture-card">
-          <h2>Create account</h2>
-          <form action={createPasswordAccountAction} className="inline-form">
-            <input name="next" type="hidden" value={nextPath} />
-            <label className="field-block">
-              <span>Email</span>
-              <input autoComplete="email" name="email" placeholder="you@example.com" required type="email" />
-            </label>
-            <label className="field-block">
-              <span>Password</span>
-              <input autoComplete="new-password" name="password" required type="password" />
-            </label>
-            <label className="field-block">
-              <span>Confirm password</span>
-              <input autoComplete="new-password" name="confirmPassword" required type="password" />
-            </label>
-            <button className="button button-solid" type="submit">
-              Create account
-            </button>
-          </form>
           {params.created === "1" ? <p className="status-strip">Account created. You can sign in now.</p> : null}
         </article>
+
+        {showCreateAccount ? (
+          <article className="capture-card">
+            <h2>Create account</h2>
+            {signupMode === "closed" ? (
+              <p className="helper-text">
+                Bonsai is in private testing, so only invited addresses can create an account.
+              </p>
+            ) : null}
+            <form action={createPasswordAccountAction} className="inline-form">
+              <input name="next" type="hidden" value={nextPath} />
+              <label className="field-block">
+                <span>Email</span>
+                <input autoComplete="email" name="email" placeholder="you@example.com" required type="email" />
+              </label>
+              <label className="field-block">
+                <span>Password</span>
+                <input autoComplete="new-password" name="password" required type="password" />
+              </label>
+              <label className="field-block">
+                <span>Confirm password</span>
+                <input autoComplete="new-password" name="confirmPassword" required type="password" />
+              </label>
+              <button className="button button-solid" type="submit">
+                Create account
+              </button>
+            </form>
+          </article>
+        ) : (
+          <article className="capture-card">
+            <h2>Not signed up yet?</h2>
+            <p className="helper-text">
+              Bonsai is in private testing and new accounts are invite-only for now. If you were promised
+              access and cannot get in, reply to the invite you received.
+            </p>
+          </article>
+        )}
       </section>
     </div>
   );

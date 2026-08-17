@@ -15,6 +15,11 @@ primary_region = "ams"
 
 [env]
   BONSAI_DATA_BACKEND = "supabase"
+  # Private testing: no public sign-up. Only the allowlisted addresses can create an
+  # account, and they get it immediately (no confirmation email). Supabase's own
+  # config also has signups disabled, so the public auth API refuses them too.
+  BONSAI_SIGNUP_MODE = "closed"
+  BONSAI_SIGNUP_ALLOWLIST = "agileupgrade@gmail.com"
   BONSAI_IMAGE_PROVIDER = "none"
   NEXT_PUBLIC_SUPABASE_URL = "https://epqxygxvvlsobbyhhnke.supabase.co"
   NEXT_PUBLIC_SUPABASE_ANON_KEY = "sb_publishable_REgFRCS_t7Rmf_s0uxx4KA_-KOIDNpf"

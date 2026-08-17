@@ -3,6 +3,12 @@
 import type { Route } from "next";
 import { redirect } from "next/navigation";
 import { isLocalBackend } from "../../lib/backend";
+import {
+  createConfirmedAccount,
+  getSignupMode,
+  isSignupAllowed,
+  SIGNUP_CLOSED_MESSAGE,
+} from "../../lib/signup";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 
 function readNextPath(formData: FormData) {
@@ -69,30 +75,62 @@ export async function createPasswordAccountAction(formData: FormData) {
   const password = readRequiredPassword(formData);
   const confirmPassword = readOptionalPasswordConfirmation(formData);
   const nextPath = readNextPath(formData);
+  // Typed routes: the query string makes these plain strings, so they need the cast.
+  const signInFailed = (message: string) =>
+    `/sign-in?error=${encodeURIComponent(message)}&next=${encodeURIComponent(nextPath)}&signup=1` as Route;
 
   if (password.length < 8) {
-    redirect(`/sign-in?error=${encodeURIComponent("Password must be at least 8 characters.")}&next=${encodeURIComponent(nextPath)}`);
+    redirect(signInFailed("Password must be at least 8 characters."));
   }
 
   if (password !== confirmPassword) {
-    redirect(`/sign-in?error=${encodeURIComponent("Passwords do not match.")}&next=${encodeURIComponent(nextPath)}`);
+    redirect(signInFailed("Passwords do not match."));
+  }
+
+  if (!isSignupAllowed(email)) {
+    redirect(signInFailed(SIGNUP_CLOSED_MESSAGE));
   }
 
   const supabase = await createSupabaseServerClient();
+
+  // Allowlisted addresses get an account straight away: created through the admin
+  // API as already-confirmed, then signed in with the password just chosen. No
+  // confirmation email, and no dependency on the public sign-up API — which is
+  // switched off at the project level while sign-ups are closed.
+  if (getSignupMode() === "closed") {
+    const result = await createConfirmedAccount(email, password);
+
+    if (result.kind === "unavailable") {
+      redirect(signInFailed(result.reason));
+    }
+
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (signInError) {
+      redirect(signInFailed(
+        result.kind === "exists"
+          ? "That address already has an account, and the password did not match it."
+          : signInError.message,
+      ));
+    }
+
+    redirect(nextPath);
+  }
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
   });
 
   if (error) {
-    redirect(`/sign-in?error=${encodeURIComponent(error.message)}&next=${encodeURIComponent(nextPath)}`);
+    redirect(signInFailed(error.message));
   }
 
   if (data.session) {
     redirect(nextPath);
   }
 
-  redirect(`/sign-in?created=1&next=${encodeURIComponent(nextPath)}`);
+  redirect(`/sign-in?created=1&next=${encodeURIComponent(nextPath)}` as Route);
 }
 
 export async function signOutAction() {

@@ -24,6 +24,14 @@ export function getVisionServiceUrl(): string | null {
   return process.env.VISION_SERVICE_URL?.trim() || null;
 }
 
+// Bypasses RLS, so it must never reach the browser. The app needs it for exactly
+// one thing: creating an allowlisted account through the admin API while public
+// sign-up is disabled (lib/signup.ts). Unset it and that path closes with a clear
+// message; everything else keeps working on the anon key.
+export function getServiceRoleKey(): string | null {
+  return process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || null;
+}
+
 export function getAnthropicApiKey(): string | null {
   return process.env.ANTHROPIC_API_KEY?.trim() || null;
 }
