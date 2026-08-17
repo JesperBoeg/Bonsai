@@ -1,6 +1,6 @@
 # Bonsai — Future-State Plan
 
-Status: **Stage A code complete and validated; production is live at https://bonsai-progress.fly.dev** (Fly.io, ams; push-to-main auto-deploys). A1 (guardrails), A2 (Storage migration), A3 (container deploy) and C1 (Studio sweeper) are implemented and validated end-to-end against the live Supabase project from a local app instance. What is left is owner-gated, not code-gated: deploy A2 to production and re-run the smoke test (A4), an SMTP account (A1's last quarter), `VOYAGE_API_KEY` (B1 gate → B2/B3), and one restore drill run (C2).
+Status: **Stage A complete and live in production at https://bonsai-progress.fly.dev** (Fly.io, ams; push-to-main auto-deploys). A1 (guardrails), A2 (Storage migration), A3 (container deploy), A4 (production smoke test **including the redeploy-persistence proof**) and C1 (Studio sweeper) are done and validated. Everything still open is owner-gated, not code-gated: an SMTP account (A1's last quarter), two backup secrets, `VOYAGE_API_KEY` (B1 gate → B2/B3), one restore-drill run (C2), and the key rotations.
 Last updated: 2026-08-17
 Companion docs: [architecture.md](architecture.md) (original recognition design), [DEPLOY.md](DEPLOY.md) (Fly deploy runbook), [GUARDRAILS.md](GUARDRAILS.md) (the four free-plan guardrails and their secrets), the review/implementation report artifact (claude.ai artifact "Bonsai — App Review & AI Roadmap").
 
@@ -114,7 +114,9 @@ Scripts-only credentials (never in the app container): `SUPABASE_SERVICE_ROLE_KE
 
 **Validated already** (local app instance driving the *live* Supabase project, Playwright + screenshot review, 2026-08-17): sign-in, capture → live Claude suggestion → tree creation, photo served from the Storage CDN, Studio design + render persisted to Storage and rendered back, tree delete removing every object, and the statelessness proof in its strongest form — the app process was restarted **and** the user's on-disk photo directory renamed away, after which every collection thumbnail, tree photo and Studio render still loaded.
 
-**Still owed (A4):** the same pass against `https://bonsai-progress.fly.dev` after deploying, including a `fly deploy`/machine restart between two photo loads, and sign-up over custom SMTP once that account exists.
+**A4 — passed in production** (2026-08-17, after the deploy): `/api/health` healthy, sign-in, capture → live Claude species suggestion → tree creation, the photo served through a Supabase signed URL, the capture landing in the bucket, and a Studio design reaching `ready` with its plan persisted (no render — production runs `BONSAI_IMAGE_PROVIDER=none`). Then the **redeploy-persistence proof**: a second deploy replaced the machine, after which every collection thumbnail, the pre-redeploy capture and the Studio design still loaded, still via signed Storage URLs, with no design left stuck in progress. Deleting the smoke-test tree removed its objects from the bucket. 9 + 5 + 4 checks, screenshots reviewed.
+
+The one thing still owed here: **sign-up over custom SMTP**, which needs that account (§6).
 
 ---
 
@@ -181,7 +183,7 @@ Nothing here is built: migration 0007 and the matching relocation are gated on 4
 | A1b Custom SMTP | not started (dashboard-only work) | Resend/Brevo account (owner) |
 | A2 Storage migration code + migration script | **done and validated** against the live project | — |
 | A3 Container deploy + deploy Action | **done** — Fly app `bonsai-progress` (ams, 512 MB, single machine), `fly.toml`, deploy Action on `main`, `ANTHROPIC_API_KEY` secret set | — |
-| A4 Production smoke test incl. redeploy-persistence proof | pending | deploying A2 (a push to `main` ships it) |
+| A4 Production smoke test incl. redeploy-persistence proof | **done** — passed after the deploy, machine replaced and every photo still loaded | sign-up-over-SMTP leg waits on the SMTP account |
 | B1 Voyage benchmark | **script ready** | `VOYAGE_API_KEY` (owner) |
 | B2 Migration 0007 + matching relocation + re-embed + leaf index | intentionally not started | B1 gate passing |
 | B3 Vision service retirement | intentionally not started | B2 validated |
@@ -193,7 +195,7 @@ Validation bar for every stage: the same as this whole effort — drive the real
 ## Open decisions
 
 1. ~~Container host~~ — **resolved: Fly.io**, live in `ams`. The vision service is not hosted anywhere; capture degrades gracefully until Stage B resolves it.
-2. **Deploy Stage A2 to production** — a push to `main` auto-deploys and unblocks A4. Optionally run the migration script inside the current machine first to keep the handful of production photos that are on its ephemeral disk.
+2. ~~Deploy Stage A2~~ — **shipped and verified in production** (commit "Ship Stage A of the future-state plan", CI and deploy green, A4 passed).
 3. **Backup secrets** — `SUPABASE_DB_URL` and `SUPABASE_SERVICE_ROLE_KEY` as repository secrets; without them the nightly backup fails by design.
 4. **SMTP provider account** (Resend or Brevo free tier) — the last quarter of A1, and the thing that currently caps sign-ups at ~2/hour.
 5. **`GEMINI_API_KEY`** (optional, any time) — turns Studio renders photoreal; the provider interface and `mock`/`none` fallbacks are already shipped.

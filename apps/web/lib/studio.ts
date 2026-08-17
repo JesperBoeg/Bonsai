@@ -33,6 +33,8 @@ const runningPipelines = new Set<string>();
 // "analyzing" forever. Anything in progress for longer than this — and not
 // running in *this* process — is therefore an orphan, and gets swept into
 // "failed" so the card offers a retry instead of a spinner that never resolves.
+// The inference holds because the app runs as a single machine; scaling out
+// would need the job's owner recorded on the row instead.
 const STALE_IN_PROGRESS_MS = 10 * 60 * 1000;
 const IN_PROGRESS_STATUSES: TargetStateStatus[] = ["pending", "analyzing", "rendering"];
 const INTERRUPTED_MESSAGE = "This design was interrupted by a server restart. Design again to pick up from the current photos.";
