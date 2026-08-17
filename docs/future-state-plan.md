@@ -1,6 +1,6 @@
 # Bonsai — Future-State Plan
 
-Status: **agreed, execution pending two owner decisions** (see [Open decisions](#open-decisions))
+Status: **in execution — production is live at https://bonsai-progress.fly.dev** (Fly.io, ams; push-to-main auto-deploys). Stage A3 (container deploy) completed ahead of A2; the pre-Stage-A caveat applies: photo bytes are on the machine's ephemeral disk until the Storage migration lands, so photos do not survive redeploys yet.
 Last updated: 2026-08-17
 Companion docs: [architecture.md](architecture.md) (original recognition design), [DEPLOY.md](DEPLOY.md) (current Render-based deploy), the review/implementation report artifact (claude.ai artifact "Bonsai — App Review & AI Roadmap").
 
@@ -166,7 +166,7 @@ Script `scripts/benchmark-voyage-reid.mjs`:
 |---|---|---|
 | A1 Guardrail crons (keep-alive, backups, SMTP, watermark) | SMTP account (owner) | small |
 | A2 Storage migration code + migration script | — | medium |
-| A3 Container deploy (Fly or Hetzner) + deploy Action | **owner: host choice + token** | small–medium |
+| A3 Container deploy + deploy Action | ~~done~~ — Fly app `bonsai-progress` (ams, 512 MB, single machine), `fly.toml`, GitHub Action deploy on main, `ANTHROPIC_API_KEY` secret set, production smoke test passed | done |
 | A4 Production smoke test incl. redeploy-persistence proof | A2, A3 | small |
 | B1 Voyage benchmark | `VOYAGE_API_KEY` (owner) | small |
 | B2 Migration 0007 + matching relocation + re-embed + leaf index | B1 gate passed | medium |
