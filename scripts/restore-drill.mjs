@@ -32,6 +32,15 @@ const EXPECTED_TABLES = ["species", "bonsai_styles", "trees", "photos", "capture
 const EXPECTED_SPECIES_COUNT = 244; // migration 0004 pins these IDs; drift here breaks every stored species_id
 const EXPECTED_FUNCTIONS = ["allocate_tree_sequence"];
 
+// The target must be pre-seeded with pgvector (pg_dump omits CREATE EXTENSION
+// when restricted to one schema), and that in turn means --clean cannot drop and
+// recreate `public`. Those two complaints are structural, not signal — but
+// anything else pg_restore objects to fails the drill.
+const EXPECTED_RESTORE_ERRORS = [
+  /cannot drop schema public because other objects depend on it/i,
+  /schema "public" already exists/i,
+];
+
 const args = parseArgs(process.argv.slice(2));
 const targetUrl = (process.env.RESTORE_TARGET_DB_URL ?? "").trim();
 const checks = [];
@@ -83,15 +92,6 @@ async function restoreDump() {
       : unexpected.slice(0, 3).join(" | "),
   );
 }
-
-// The target must be pre-seeded with pgvector (pg_dump omits CREATE EXTENSION
-// when restricted to one schema), and that in turn means --clean cannot drop and
-// recreate `public`. Those two complaints are structural, not signal — but
-// anything else pg_restore objects to fails the drill.
-const EXPECTED_RESTORE_ERRORS = [
-  /cannot drop schema public because other objects depend on it/i,
-  /schema "public" already exists/i,
-];
 
 function runRestore(extraArgs, label) {
   const result = spawnSync(
