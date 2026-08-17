@@ -73,13 +73,25 @@ async function restoreDump() {
   const prePost = runRestore(["--clean", "--if-exists", "--section=pre-data", "--section=data"], "schema + data");
   await seedAuthUsers();
   const post = runRestore(["--section=post-data"], "constraints, indexes, policies");
+  const unexpected = [...prePost.unexpected, ...post.unexpected];
 
   record(
-    "pg_restore completed without errors",
-    prePost.status === 0 && post.status === 0,
-    `schema+data exit ${prePost.status}, post-data exit ${post.status}`,
+    "pg_restore reported no unexpected errors",
+    unexpected.length === 0,
+    unexpected.length === 0
+      ? `${prePost.expected.length + post.expected.length} known artifact(s) ignored`
+      : unexpected.slice(0, 3).join(" | "),
   );
 }
+
+// The target must be pre-seeded with pgvector (pg_dump omits CREATE EXTENSION
+// when restricted to one schema), and that in turn means --clean cannot drop and
+// recreate `public`. Those two complaints are structural, not signal — but
+// anything else pg_restore objects to fails the drill.
+const EXPECTED_RESTORE_ERRORS = [
+  /cannot drop schema public because other objects depend on it/i,
+  /schema "public" already exists/i,
+];
 
 function runRestore(extraArgs, label) {
   const result = spawnSync(
@@ -92,14 +104,20 @@ function runRestore(extraArgs, label) {
     fail(`pg_restore could not run (${result.error.message}). Install the PostgreSQL client tools.`);
   }
 
-  const errors = (result.stderr ?? "").split("\n").filter((line) => line.includes("pg_restore: error:"));
-  console.log(`  ${label}: exit ${result.status}${errors.length > 0 ? `, ${errors.length} error line(s)` : ""}`);
+  const errors = (result.stderr ?? "")
+    .split("\n")
+    .filter((line) => line.includes("pg_restore: error:"))
+    .map((line) => line.trim());
+  const expected = errors.filter((line) => EXPECTED_RESTORE_ERRORS.some((pattern) => pattern.test(line)));
+  const unexpected = errors.filter((line) => !EXPECTED_RESTORE_ERRORS.some((pattern) => pattern.test(line)));
 
-  if (errors.length > 0) {
-    console.log(indent(errors.slice(0, 8).join("\n")));
+  console.log(`  ${label}: exit ${result.status}, ${expected.length} known artifact(s), ${unexpected.length} unexpected error(s)`);
+
+  if (unexpected.length > 0) {
+    console.log(indent(unexpected.slice(0, 8).join("\n")));
   }
 
-  return result;
+  return { ...result, expected, unexpected };
 }
 
 // The target may be a bare Postgres with a stub auth.users (the drill's own CI
